@@ -1,31 +1,17 @@
 /* Compiler functions */
+var pitchMap = {
+	A: 9,
+	B: 11,
+	C: 0,
+	D: 2,
+	E: 4,
+	F: 5
+	G: 7
+};
+
 var convertPitch = function(pitch) {
-	var midi =  12 + 12 * parseInt(pitch[1]);
-	switch(pitch[0].toUpperCase()) {
-		case 'A':
-			midi += 9;
-			break;
-		case 'B':
-			midi += 11;
-			break;
-		case 'C':
-			midi += 0;
-			break;
-		case 'D':
-			midi += 2;
-			break;
-		case 'E':
-			midi += 4;
-			break;
-		case 'F':
-			midi += 5;
-			break;
-		case 'G':
-			midi += 7;
-			break;
-	}
-	return midi;
-}
+	return 12 + 12 * parseInt(pitch[1]) + pitchMap[pitch[0].toUpperCase()];
+};
 
 var endTime = function (expr, time) {
 	return getHandler(expr).endTime(expr, time);
@@ -41,10 +27,10 @@ var compile = function(musexpr) {
 
 /* OOP Classes */
 function TagHandler() {
-}
+};
 
 function NoteHandler() {
-}
+};
 
 NoteHandler.prototype = new TagHandler();
 
@@ -66,7 +52,7 @@ NoteHandler.prototype.endTime = function (expr, time) {
 };
 
 function RestHandler() {
-}
+};
 
 RestHandler.prototype = new TagHandler();
 
@@ -87,7 +73,7 @@ RestHandler.prototype.endTime = function (expr, time) {
 };
 
 function SeqHandler() {
-}
+};
 
 SeqHandler.prototype = new TagHandler();
 
@@ -106,7 +92,7 @@ SeqHandler.prototype.endTime = function (expr, time) {
 };
 
 function ParHandler() {
-}
+};
 
 ParHandler.prototype = new TagHandler();
 
@@ -124,7 +110,7 @@ ParHandler.prototype.endTime = function (expr, time) {
 };
 
 function RepeatHandler() {
-}
+};
 
 RepeatHandler.prototype = new TagHandler();
 
