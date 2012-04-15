@@ -5,7 +5,7 @@ var pitchMap = {
 	C: 0,
 	D: 2,
 	E: 4,
-	F: 5
+	F: 5,
 	G: 7
 };
 
@@ -18,11 +18,11 @@ var endTime = function (expr, time) {
 };
 
 var compileT = function(expr, time) {
-    return getHandler(expr).compileT(expr, time);
+	return getHandler(expr).compileT(expr, time);
 };
 
 var compile = function(musexpr) {
-    return compileT(musexpr, 0);
+	return compileT(musexpr, 0);
 };
 
 /* OOP Classes */
@@ -35,7 +35,7 @@ function NoteHandler() {
 NoteHandler.prototype = new TagHandler();
 
 NoteHandler.prototype.compileT = function(expr, time) {
-    var result = [];
+	var result = [];
 	result.push(
 		{
 			tag : 'note', 
@@ -44,7 +44,7 @@ NoteHandler.prototype.compileT = function(expr, time) {
 			dur: expr.dur
 		}
 	);
-    return result;
+	return result;
 };
 
 NoteHandler.prototype.endTime = function (expr, time) {
@@ -57,7 +57,7 @@ function RestHandler() {
 RestHandler.prototype = new TagHandler();
 
 RestHandler.prototype.compileT = function(expr, time) {
-    var result = [];
+	var result = [];
 	result.push(
 		{
 			tag : 'rest', 
@@ -65,7 +65,7 @@ RestHandler.prototype.compileT = function(expr, time) {
 			dur: expr.dur
 		}
 	);	
-    return result;
+	return result;
 };
 
 RestHandler.prototype.endTime = function (expr, time) {
@@ -78,11 +78,11 @@ function SeqHandler() {
 SeqHandler.prototype = new TagHandler();
 
 SeqHandler.prototype.compileT = function(expr, time) {
-    var result = [];
+	var result = [];
 	result = result.concat(compileT(expr.left, time));
 	time = endTime(expr.left, time);
 	result = result.concat(compileT(expr.right, time));
-    return result;
+	return result;
 };
 
 SeqHandler.prototype.endTime = function (expr, time) {
@@ -97,10 +97,10 @@ function ParHandler() {
 ParHandler.prototype = new TagHandler();
 
 ParHandler.prototype.compileT = function(expr, time) {
-    var result = [];
+	var result = [];
 	result = result.concat(compileT(expr.left, time));
 	result = result.concat(compileT(expr.right, time));
-    return result;
+	return result;
 };
 
 ParHandler.prototype.endTime = function (expr, time) {
@@ -115,12 +115,12 @@ function RepeatHandler() {
 RepeatHandler.prototype = new TagHandler();
 
 RepeatHandler.prototype.compileT = function(expr, time) {
-    var result = [];
+	var result = [];
 	for(var i = 0; i < expr.count; i++) {
 		result = result.concat(compileT(expr.section, time));
 		time = endTime(expr.section, time);
 	}
-    return result;
+	return result;
 };
 
 RepeatHandler.prototype.endTime = function (expr, time) {
@@ -142,7 +142,7 @@ var UnknownTagException = function(tag) {
 
 var getHandler = function(expr) {
 	var handler = handlerMap[expr.tag.toLowerCase()];
-	if(handler === null) {
+	if(!handler) {
 		throw new UnknownTagException(expr.tag);
 	}
 	return handler;
@@ -150,17 +150,17 @@ var getHandler = function(expr) {
 
 /* Test methods */
 var melody_mus = 
-    { tag: 'seq',
-      left: 
-       { tag: 'par',
-         left: { tag: 'note', pitch: 'c3', dur: 250 },
-         right: { tag: 'note', pitch: 'g4', dur: 500 } },
-      right:
-       { tag: 'seq',
-         left: { tag: 'repeat',
-				 section: { tag: 'note', pitch: 'c4', dur: 250 },
-				 count: 3 },
-         right: { tag: 'rest', dur: 250 } } };
+	{ tag: 'seq',
+	left: 
+		{ tag: 'par',
+			left: { tag: 'note', pitch: 'c3', dur: 250 },
+			right: { tag: 'note', pitch: 'g4', dur: 500 } },
+	right:
+		{ tag: 'seq',
+			left: { tag: 'repeat',
+				section: { tag: 'note', pitch: 'c4', dur: 250 },
+				count: 3 },
+			right: { tag: 'rest', dur: 250 } } };
 
 console.log(melody_mus);
 console.log(compile(melody_mus));
