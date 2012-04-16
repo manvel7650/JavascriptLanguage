@@ -10,7 +10,7 @@ var convertPitch = function(pitch) {
 var compileT = function(expr, time, result) {
 	var handler = handlerMap[expr.tag.toLowerCase()];
 	if(!handler) {
-	    console.log('Handler for tag \'' + expr.tag + '\' not found');
+		console.log('Handler for tag \'' + expr.tag + '\' not found');
 		return time;
 	} else {
 		return handler.compileT(expr, time, result);
