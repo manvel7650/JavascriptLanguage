@@ -4,7 +4,7 @@ var pitchMap = {
 };
 
 var convertPitch = function(pitch) {
-	return 12 + 12 * parseInt(pitch[1]) + pitchMap[pitch[0].toUpperCase()];
+	return 12 + 12 * parseInt(pitch[1], 10) + pitchMap[pitch[0].toUpperCase()];
 };
 
 var compileT = function(expr, time, result) {
@@ -24,21 +24,21 @@ var compile = function(musexpr) {
 };
 
 /* OOP Classes */
-function NoteHandler() {};
+function NoteHandler() {}
 
 NoteHandler.prototype.compileT = function(expr, time, result) {
 	result.push({tag: 'note', pitch: convertPitch(expr.pitch), start: time, dur: expr.dur});
 	return time + expr.dur;
 };
 
-function RestHandler() {};
+function RestHandler() {}
 
 RestHandler.prototype.compileT = function(expr, time, result) {
 	result.push({tag: 'rest', start: time, dur: expr.dur});	
 	return time + expr.dur;
 };
 
-function SeqHandler() {};
+function SeqHandler() {}
 
 SeqHandler.prototype.compileT = function(expr, time, result) {
 	time = compileT(expr.left, time, result);
@@ -46,7 +46,7 @@ SeqHandler.prototype.compileT = function(expr, time, result) {
 	return time;
 };
 
-function ParHandler() {};
+function ParHandler() {}
 
 ParHandler.prototype.compileT = function(expr, time, result) {
 	var leftTime = compileT(expr.left, time, result);
@@ -54,7 +54,7 @@ ParHandler.prototype.compileT = function(expr, time, result) {
 	return Math.max(leftTime, rightTime);
 };
 
-function RepeatHandler() {};
+function RepeatHandler() {}
 
 RepeatHandler.prototype.compileT = function(expr, time, result) {
 	for(var i = 0; i < expr.count; i++) {
