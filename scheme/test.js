@@ -1,6 +1,6 @@
 var PEG = require('pegjs');
 var assert = require('assert');
-var fs = require('fs'); // for loading files
+var fs = require('fs');
 
 fs.readFile('scheme.peg', 'ascii', function(err, data) {
 	// Create my parser
@@ -40,7 +40,7 @@ var wrapAssertion = function(f) {
 			console.log("SUCCESS: " + message);
 		}
 		catch(err) {
-			console.log("FAILED: " + err.message + ". Actual -> " + actual + ", expected -> " + expected);
+			console.log("FAILED: " + err.message + ". Actual -> " + JSON.stringify(actual, null, '\t') + ", expected -> " + JSON.stringify(expected, null, '\t'));
 		}
 	}
 }

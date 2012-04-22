@@ -1,0 +1,27 @@
+start = expression
+
+expression = ignore* a:(tag) ignore* {return a;}
+
+tag = note / rest / seq / par
+
+note = noteStartChar ignore+ pitch:noteName ignore+ dur:duration {return {'tag': 'note', 'pitch': pitch, 'dur': dur};}
+
+rest = restStartChar ignore+ dur:duration {return {'tag': 'rest', 'dur': dur};}
+
+seq = seqStartChar ignore+ {return {'tag' : 'seq'}}
+
+par = parStartChar ignore+ {return {'tag' : 'par'}}
+
+ignore = ignoreChar
+
+noteName = pitch:[A-G] octave:[0-9] {return "" + pitch + octave}
+
+duration = startDurationChar ignore+ a:[0-9]+ {return parseInt(a.join(""), 10)}
+
+noteStartChar = "play" ignoreChar+ "note"
+restStartChar = "rest"
+seqStartChar = "seq"
+parStartChar = "par"
+listSeparatorChar = ","
+startDurationChar = "for"
+ignoreChar = [ \t\r\n]
