@@ -18,7 +18,7 @@ noteName = pitch:[A-G] octave:[0-9] {return "" + pitch + octave}
 
 duration = startDurationChar ignore+ a:[0-9]+ {return parseInt(a.join(""), 10)}
 
-noteStartChar = "play" ignoreChar+ "note"
+noteStartChar = "play" ignore+ "note"
 restStartChar = "rest"
 seqStartChar = "seq"
 parStartChar = "par"
