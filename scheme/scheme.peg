@@ -1,0 +1,20 @@
+start = expression
+
+expression = ignore* a:(atom / quote / expressionList) ignore* {return a;}
+
+ignore = comment / ignoreChar
+
+comment = commentChar [^\r\n]* [\r\n]? 
+
+atom = chars:validChar+ {return chars.join("");}
+
+quote = quoteChar a:expression {return ['quote', a];}
+
+expressionList = startListChar a:expression+ endListChar {return a;}
+
+validChar = [0-9a-zA-Z_?!+=@#$%^&*/.-]
+ignoreChar = [ \t\r\n]
+startListChar = "("
+endListChar = ")"
+commentChar = ";;"
+quoteChar = "\'"
