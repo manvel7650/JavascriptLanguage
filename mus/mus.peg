@@ -1,27 +1,31 @@
-start = expression
+start = seq
 
-expression = ignore* a:(tag) ignore* {return a;}
+seq = left:par seqSeparator right:seq {return {'tag': 'seq', 'left': left, 'right': right};}
+	/ par
 
-tag = note / rest / seq / par
+par = left:item parSeparator right:par {return {'tag': 'par', 'left': left, 'right': right};}
+	/ item
 
-note = noteStartChar ignore+ pitch:noteName ignore+ dur:duration {return {'tag': 'note', 'pitch': pitch, 'dur': dur};}
+item = ignoreChar* a:(note/rest) ignoreChar* {return a;}
 
-rest = restStartChar ignore+ dur:duration {return {'tag': 'rest', 'dur': dur};}
+note = pitch:noteName dur:duration {return {'tag': 'note', 'pitch': pitch, 'dur': dur};}
 
-seq = seqStartChar ignore+ {return {'tag' : 'seq'}}
-
-par = parStartChar ignore+ {return {'tag' : 'par'}}
+rest = restChar dur:duration {return {'tag': 'rest', 'dur': dur};}
 
 ignore = ignoreChar
 
 noteName = pitch:[A-G] octave:[0-9] {return "" + pitch + octave}
 
-duration = startDurationChar ignore+ a:[0-9]+ {return parseInt(a.join(""), 10)}
+duration = durationStartChar a:[0-9]+ durationEndChar {return parseInt(a.join(""), 10)}
 
-noteStartChar = "play" ignore+ "note"
-restStartChar = "rest"
-seqStartChar = "seq"
-parStartChar = "par"
-listSeparatorChar = ","
-startDurationChar = "for"
-ignoreChar = [ \t\r\n]
+repeatCount = a:[0-9]+ {return parseInt(a.join(""), 10)}
+
+seqSeparator = "\r\n" / "\n"
+parSeparator = ","
+restChar = "REST"
+repeatStartChar = "{"
+repeatEndChar = "}"
+durationStartChar = "["
+durationEndChar = "]"
+ignoreChar = [ \t]
+eolChar = "\r\n" / "\n" / !.

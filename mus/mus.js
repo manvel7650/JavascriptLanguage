@@ -17,7 +17,7 @@ var mus = (function(undefined) {
 		}
 	};
 
-	var parser = PEG.buildParser(fs.readFileSync('mus.peg', 'ascii'));
+	var parser = PEG.buildParser(fs.readFileSync('mus.peg', 'ascii'), {trackLineAndColumn: true});
 	
 	var pitchMap = {
 		A: 9, B: 11, C: 0, D: 2, E: 4, F: 5, G: 7
