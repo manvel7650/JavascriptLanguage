@@ -1,16 +1,26 @@
-start = seq
+start = seqOrPar
 
-seq = left:par seqSeparator right:seq {return {'tag': 'seq', 'left': left, 'right': right};}
-	/ par
-
-par = left:item parSeparator right:par {return {'tag': 'par', 'left': left, 'right': right};}
+seqOrPar = t:(seqChar/parChar) groupStartChar a:seqOrPar+ groupEndChar 
+{
+	var result = {tag: t.toLowerCase(), left: a[0]};
+	var temp = result;
+	for(var i=1; i<a.length; i++) {
+		if(i == a.length - 1) {
+			temp['right'] = a[i];
+		} else {
+			temp['rigth'] = {tag: 'seq', left: a[i]};
+			temp = temp['right'];
+		}
+	}
+	return result;
+}
 	/ item
 
-item = ignoreChar* a:(note/rest) ignoreChar* {return a;}
+item = a:(note/rest) {return a;}
 
-note = pitch:noteName dur:duration {return {'tag': 'note', 'pitch': pitch, 'dur': dur};}
+note = pitch:noteName dur:duration {return {tag: 'note', pitch: pitch, dur: dur};}
 
-rest = restChar dur:duration {return {'tag': 'rest', 'dur': dur};}
+rest = restChar dur:duration {return {tag: 'rest', dur: dur};}
 
 ignore = ignoreChar
 
@@ -20,12 +30,12 @@ duration = durationStartChar a:[0-9]+ durationEndChar {return parseInt(a.join(""
 
 repeatCount = a:[0-9]+ {return parseInt(a.join(""), 10)}
 
-seqSeparator = "\r\n" / "\n"
-parSeparator = ","
+seqChar = "SEQ";
+parChar = "PAR";
 restChar = "REST"
-repeatStartChar = "{"
-repeatEndChar = "}"
+groupStartChar = "{"
+groupEndChar = "}"
+groupSeparatorChar = ","
 durationStartChar = "["
 durationEndChar = "]"
-ignoreChar = [ \t]
-eolChar = "\r\n" / "\n" / !.
+ignoreChar = " " / "\t" / "\r\n" / "\n"
