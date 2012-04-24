@@ -1,41 +1,29 @@
-start = seqOrPar
-
-seqOrPar = t:(seqChar/parChar) groupStartChar a:seqOrPar+ groupEndChar 
 {
-	var result = {tag: t.toLowerCase(), left: a[0]};
-	var temp = result;
-	for(var i=1; i<a.length; i++) {
-		if(i == a.length - 1) {
-			temp['right'] = a[i];
-		} else {
-			temp['rigth'] = {tag: 'seq', left: a[i]};
-			temp = temp['right'];
+	function buildTree(tagName, a) {
+		var result = {tag: tagName, left: a[0]}, temp = result, start = 1, end = a.length - 1;
+		for(var i=start; i<end; i++) {
+			temp.right = {tag: tagName, left: a[i]};
+			temp = temp.right;
 		}
-	}
-	return result;
+		temp.right = a[end];
+		return result;
+	};
 }
-	/ item
 
-item = a:(note/rest) {return a;}
+start = tag 
 
-note = pitch:noteName dur:duration {return {tag: 'note', pitch: pitch, dur: dur};}
+tag = ignoreChar* tag:(repeat / seq / par / note / rest) ignoreChar* {return tag;}
 
-rest = restChar dur:duration {return {tag: 'rest', dur: dur};}
+repeat = "[" count:[0-9]+ "]" tag:tag {return {tag: 'repeat', section: tag, count: parseInt(count.join("", 10))};}
 
-ignore = ignoreChar
+seq = "{" tags:(start:(tag:tag ',' {return tag;})* last:tag {return start.concat(last);}) "}" {return buildTree('seq', tags);}
 
-noteName = pitch:[A-G] octave:[0-9] {return "" + pitch + octave}
+par = "{" tags:(start:(tag:tag '|' {return tag;})* last:tag {return start.concat(last);}) "}" {return buildTree('par', tags);}
 
-duration = durationStartChar a:[0-9]+ durationEndChar {return parseInt(a.join(""), 10)}
+note = pitch:[A-G]i octave:[0-9] duration:duration {return {tag: 'note', pitch: "" + pitch.toLowerCase() + octave, dur: duration};}
 
-repeatCount = a:[0-9]+ {return parseInt(a.join(""), 10)}
+rest = "_" duration:duration {return {tag: 'rest', dur: duration};}
 
-seqChar = "SEQ";
-parChar = "PAR";
-restChar = "REST"
-groupStartChar = "{"
-groupEndChar = "}"
-groupSeparatorChar = ","
-durationStartChar = "["
-durationEndChar = "]"
+duration = ":" duration:[0-9]+ {return parseInt(duration.join("", 10));}
+
 ignoreChar = " " / "\t" / "\r\n" / "\n"
