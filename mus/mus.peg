@@ -16,9 +16,9 @@ tag = ignoreChar* tag:(repeat / seq / par / note / rest) ignoreChar* {return tag
 
 repeat = "[" count:[0-9]+ "]" tag:tag {return {tag: 'repeat', section: tag, count: parseInt(count.join("", 10))};}
 
-seq = "{" tags:(start:(tag:tag ',' {return tag;})* last:tag {return start.concat(last);}) "}" {return buildTree('seq', tags);}
+seq = "{" tags:(start:(tag:tag ',' {return tag;})+ last:tag {return start.concat(last);}) "}" {return buildTree('seq', tags);}
 
-par = "{" tags:(start:(tag:tag '|' {return tag;})* last:tag {return start.concat(last);}) "}" {return buildTree('par', tags);}
+par = "{" tags:(start:(tag:tag '|' {return tag;})+ last:tag {return start.concat(last);}) "}" {return buildTree('par', tags);}
 
 note = pitch:[A-G]i octave:[0-9] duration:duration {return {tag: 'note', pitch: "" + pitch.toLowerCase() + octave, dur: duration};}
 
