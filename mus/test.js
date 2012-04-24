@@ -3,27 +3,41 @@ var assert = require('assert');
 var fs = require('fs');
 var mus = require('./mus.js');
 
-var wrapAssertion = function(f) {
-	return function(actual, expected, message) {
+function MusTester(testSuite) {
+	this.suite = testSuite;
+};
+
+MusTester.prototype.execute = function() {
+	for(var i = 0; i<this.suite.length; i++) {
+		var test = this.suite[i];
 		try {
-			f(actual, expected, message);
-			console.log("SUCCESS: " + message);
+			var musparsed = mus.parse(test.musexpr);
+			assert.deepEqual(musparsed, test.musparsed);
+			var muscompiled = mus.compile(musparsed);
+			assert.deepEqual(muscompiled, test.muscompiled);
 		}
 		catch(err) {
-			console.log("FAILED: " + err.message + ". Actual -> " + JSON.stringify(actual, null, '\t') + ", expected -> " + JSON.stringify(expected, null, '\t'));
+			console.log("Failed : " + test.message + ", cause : " + err);
 		}
 	}
-}
+};
 
-var deepEqual = wrapAssertion(assert.deepEqual);
+var testSuite = [
+	{musexpr : "a4:500", musparsed : {tag:'note',pitch:'a4',dur: 500}, muscompiled : [{tag:'note',pitch:69,start: 0,dur:500}], message : "Single note test"}
+];
 
+var musTester = new MusTester(testSuite);
+musTester.execute();
+
+
+/*
 deepEqual(mus.parse("A4[500]"), {tag:'note',pitch:'A4',dur: 500}, "A4[500]");
 deepEqual(mus.compile(mus.parse("A4[500]")), [{tag:'note',pitch:69,start: 0,dur:500}], "A4[500]");
 deepEqual(mus.parse("REST[500]"), {tag:'rest',dur: 500}, "REST[500]");
 deepEqual(mus.compile(mus.parse("REST[500]")), [{tag:'rest',start: 0,dur:500}], "REST[500]");
 deepEqual(mus.parse("SEQ{A4[500]REST[500]}"), {tag:'seq',left:{tag:'note',pitch:'A4',dur: 500},right:{tag:'rest',dur:500}}, "A4[500]\nREST[500]");
 deepEqual(mus.parse("PAR{A4[500]REST[500]}"), {tag:'par',left:{tag:'note',pitch:'A4',dur: 500},right:{tag:'rest',dur:500}}, "A4[500],REST[500]");
-/*deepEqual(mus.parse("3{A4[500]}"), {tag:'repeat',section:{tag:'note',pitch:'A4',dur: 500},count:3}, "3{A4[500]}");
+deepEqual(mus.parse("3{A4[500]}"), {tag:'repeat',section:{tag:'note',pitch:'A4',dur: 500},count:3}, "3{A4[500]}");
 deepEqual(mus.parse("3  \n{\n  A4[500]\n\t}"), {tag:'repeat',section:{tag:'note',pitch:'A4',dur: 500},count:3}, "3  \n{\n  A4[500]\n\t}");
 
 var melody_mus = "C3[250],G4[500]\n3{C4[250]}\nREST[250]";

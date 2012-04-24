@@ -21,9 +21,7 @@ var mus = (function(undefined) {
 	
 	var pitchMap = {
 		A: 9, B: 11, C: 0, D: 2, E: 4, F: 5, G: 7
-	};
-	
-	
+	};	
 
 	var convertPitch = function(pitch) {
 		return 12 + 12 * parseInt(pitch[1], 10) + pitchMap[pitch[0].toUpperCase()];
