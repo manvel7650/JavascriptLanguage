@@ -1,29 +1,20 @@
-{
-	function buildTree(tagName, a) {
-		var result = {tag: tagName, left: a[0]}, temp = result, start = 1, end = a.length - 1;
-		for(var i=start; i<end; i++) {
-			temp.right = {tag: tagName, left: a[i]};
-			temp = temp.right;
-		}
-		temp.right = a[end];
-		return result;
-	};
-}
+start = seq
 
-start = tag 
+seq = sep* left:par '->' right:seq sep* { return {tag: 'seq', left: left, right: right}; }
+	/ par
 
-tag = ignoreChar* tag:(repeat / seq / par / note / rest) ignoreChar* {return tag;}
+par = sep* left:item '|' right:par sep* { return {tag: 'par', left: left, right: right}; }
+	/ item
 
-repeat = "[" count:[0-9]+ "]" tag:tag {return {tag: 'repeat', section: tag, count: parseInt(count.join("", 10))};}
+item = sep* pitch:pitch duration:duration sep* {return {tag: 'note', pitch: pitch, dur: duration};}
+	/ sep* '_' duration:duration sep* {return {tag: 'rest', dur: duration};}
+	/ sep* '[' count:[0-9]+ ']' seq:seq sep* { return {tag: 'repeat', section: seq, count: parseInt(count.join("", 10))}; }
+	/ sep* '(' seq:seq ')' sep* { return seq; }
 
-seq = "{" tags:(start:(tag:tag ',' {return tag;})+ last:tag {return start.concat(last);}) "}" {return buildTree('seq', tags);}
+pitch = pitch:[A-G]i octave:[0-9] {return "" + pitch.toLowerCase() + octave;}
+	
+duration = ":" duration:[0-9]+ { return parseInt(duration.join("", 10)); }
 
-par = "{" tags:(start:(tag:tag '|' {return tag;})+ last:tag {return start.concat(last);}) "}" {return buildTree('par', tags);}
+sep = [' '\t\n\r] / '//' [^\n\r]* eol 
 
-note = pitch:[A-G]i octave:[0-9] duration:duration {return {tag: 'note', pitch: "" + pitch.toLowerCase() + octave, dur: duration};}
-
-rest = "_" duration:duration {return {tag: 'rest', dur: duration};}
-
-duration = ":" duration:[0-9]+ {return parseInt(duration.join("", 10));}
-
-ignoreChar = " " / "\t" / "\r\n" / "\n"
+eol = [\n\r]{1,2} / !. 

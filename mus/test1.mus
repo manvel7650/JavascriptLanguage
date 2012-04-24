@@ -1,7 +1,12 @@
-{
-	{
-		c3:250 , 
-		g4:500
-	}, 
-	[3] { c4:250 | _:250 }
-}
+// This is a sample mus file
+// Here we go with a sequence
+(c3:250 -> g4:500)
+
+// Continues with another sequence
+->
+// Let's repeat three times
+[3] 
+(
+	// Oh! it's parallel
+	c4:250 | _:250
+)
