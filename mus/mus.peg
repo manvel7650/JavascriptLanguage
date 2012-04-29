@@ -15,6 +15,6 @@ pitch = pitch:[A-G]i octave:[0-9] {return "" + pitch.toLowerCase() + octave;}
 	
 duration = ":" duration:[0-9]+ { return parseInt(duration.join("", 10)); }
 
-ignore = [' '\t\n\r] / '//' [^\n\r]* eol 
+ignore = [ \t\n\r] / '//' [^\n\r]* eol 
 
 eol = [\n\r]{1,2} / !. 

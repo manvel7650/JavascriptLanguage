@@ -106,6 +106,32 @@ var scheem = (function(undefined) {
 		return result;
 	};
 	
+	function ConsHandler() {}
+	
+	ConsHandler.prototype.evalScheem = function(expr, env) {
+		var result = [evalScheem(expr[1], env)];
+		return result.concat(evalScheem(expr[2], env));
+	};
+	
+	function CarHandler() {}
+	
+	CarHandler.prototype.evalScheem = function(expr, env) {
+		return evalScheem(expr[1], env)[0];
+	};
+	
+	function CdrHandler() {}
+	
+	CdrHandler.prototype.evalScheem = function(expr, env) {
+		return evalScheem(expr[1], env).slice(1);
+	};
+	
+	function IfHandler() {}
+	
+	IfHandler.prototype.evalScheem = function(expr, env) {
+		var isTrue = evalScheem(expr[1], env) === '#t';
+		return evalScheem(expr[isTrue ? 2 : 3], env);
+	};
+	
 	var typeHandlerMap = {
 		'string' : new VariableHandler(),
 		'number' : new NumberHandler(),
@@ -122,9 +148,12 @@ var scheem = (function(undefined) {
 		'quote' : new QuoteHandler(),
 		'define' : new DefineHandler(),
 		'set!' : new SetHandler(),
-		'begin' : new BeginHandler()
+		'begin' : new BeginHandler(),
+		'cons' : new ConsHandler(),
+		'car' : new CarHandler(),
+		'cdr' : new CdrHandler(),
+		'if' : new IfHandler()
 	};
-
 	
 	return scheem;
 })();

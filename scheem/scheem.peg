@@ -1,20 +1,13 @@
-start = expression
+start = atom
 
-expression = ignore* a:(atom / quote / expressionList) ignore* {return a;}
+atom = ignore* number:numberChar+ ignore* {return parseInt(number.join(""));}
+	/ ignore* atom:atomChar+ ignore* {return atom.join("");}
+	/ ignore* '\'' a:atom ignore* {return ['quote', a];}
+	/ ignore* '(' exp:atom+ ')' ignore* { return exp.length == 1 ? exp[0] : exp; }
 
 ignore = comment / ignoreChar
-
-comment = commentChar [^\r\n]* [\r\n]? 
-
-atom = chars:validChar+ {return chars.join("");}
-
-quote = quoteChar a:expression {return ['quote', a];}
-
-expressionList = startListChar a:expression+ endListChar {return a;}
-
-validChar = [0-9a-zA-Z_?!+=@#$%^&*/.-]
-ignoreChar = [ \t\r\n]
-startListChar = "("
-endListChar = ")"
-commentChar = ";;"
-quoteChar = "\'"
+comment = ';;' [^\n\r]* eol
+numberChar = [0-9]
+atomChar = [0-9a-zA-Z_?!+=@#$%^&*/.-]
+ignoreChar = [ \t\n\r]
+eol = [\n\r]{1,2} / !. 

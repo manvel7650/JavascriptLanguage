@@ -5,7 +5,7 @@ if (typeof module !== 'undefined') {
 	var assert = chai.assert;
 }
 
-suite('quote', function() {
+suite('eval quote', function() {
 	test('a number', function() {
 		assert.deepEqual(
 			scheem.evalScheem(['quote', 3], {}),
@@ -24,9 +24,20 @@ suite('quote', function() {
 			[1, 2, 3]
 		);
 	});
+	test('(quote (+ 2 3)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['quote', ['+', 2, 3]], {}),
+			['+', 2, 3]
+		);
+	});
+	test('(quote (quote (+ 2 3))) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['quote', ['quote', ['+', 2, 3]]], {}),
+			['quote', ['+', 2, 3]]
+		);
+	});
 });
-
-suite('+-*/', function() {
+suite('eval +-*/', function() {
 	test('5 test', function() {
 		assert.deepEqual(
 			scheem.evalScheem(5, {}),
@@ -58,8 +69,7 @@ suite('+-*/', function() {
 		);
 	});
 });
-
-suite('variable', function() {
+suite('eval variable', function() {
 	var env = {x:2, y:3, z:10};	
 	test('x test', function() {
 		assert.deepEqual(
@@ -81,7 +91,7 @@ suite('variable', function() {
 	});
 });
 
-suite('define, set!', function() {
+suite('eval define,set!', function() {
 	var env = {x:2, y:3, z:10};	
 	test('evaluation of define test', function() {
 		assert.deepEqual(
@@ -122,7 +132,7 @@ suite('define, set!', function() {
 		);
 	});	
 });
-suite('begin', function() {
+suite('eval begin', function() {
 	test('(begin 1 2 3) test', function() {
 		assert.deepEqual(
 			scheem.evalScheem(['begin', 1, 2, 3], {}),
@@ -148,7 +158,7 @@ suite('begin', function() {
 		);
 	});
 });
-suite('<, =', function() {
+suite('eval <, =', function() {
 	test('(< 2 2) test', function() {
 		assert.deepEqual(
 			scheem.evalScheem(['<', 2, 2], {}),
@@ -165,6 +175,64 @@ suite('<, =', function() {
 		assert.deepEqual(
 			scheem.evalScheem(['<', ['+', 1, 1], ['+', 2, 3]], {}),
 			'#t'
+		);
+	});
+});
+suite('eval cons,car,cdr', function() {
+	test('(cons 1 \'(2 3)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['cons', 1, ['quote', [2, 3]]], {}),
+			[1, 2, 3]
+		);
+	});
+	test('(cons \'(1 2) \'(3 4)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['cons', ['quote', [1, 2]], ['quote', [3, 4]]], {}),
+			[[1, 2], 3, 4]
+		);
+	});
+	test('(car \'((1 2) 3 4)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['car', ['quote', [[1, 2], 3, 4]]], {}),
+			[1, 2]
+		);
+	});
+	test('(cdr \'((1 2) 3 4)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['cdr', ['quote', [[1, 2], 3, 4]]], {}),
+			[3, 4]
+		);
+	});	
+});
+suite('eval if', function() {
+	test('(if (= 1 1) 2 3) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['if', ['=', 1, 1], 2, 3], {}),
+			2
+		);
+	});
+	test('(if (= 1 0) 2 3) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['if', ['=', 1, 0], 2, 3], {}),
+			3
+		);
+	});
+	test('(if (= 1 1) 2 error) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['if', ['=', 1, 1], 2, 'error'], {}),
+			2
+		);
+	});
+	test('(if (= 1 1) error 3) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['if', ['=', 1, 0], 'error', 3], {}),
+			3
+		);
+	});
+	test('(if (= 1 1) (if (= 2 3) 10 11) 12) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['if', ['=', 1, 1], ['if', ['=', 2, 3], 10, 11], 12], {}),
+			11
 		);
 	});
 });
