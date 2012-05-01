@@ -12,7 +12,7 @@ suite('interpreter', function() {
 		expect(
 			function() { scheem.evalScheemString('(a b c)') }
 		).to.throw(
-			new scheem.VariableNotFoundError
+			SCHEEM.VariableNotFoundError
 		);
 	});
 	
@@ -20,14 +20,14 @@ suite('interpreter', function() {
 		expect(
 			function() { scheem.evalScheemString('atom') }
 		).to.throw(
-			new scheem.AtomNotFoundError
+			SCHEEM.VariableNotFoundError
 		);
 	});
 	test('(+ x 3)', function() {
 		expect(
 			function() { scheem.evalScheemString('(+ x 3)') }
 		).to.throw(
-			new scheem.AtomNotFoundError
+			SCHEEM.VariableNotFoundError
 		);
 	});
 });

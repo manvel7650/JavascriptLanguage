@@ -1,22 +1,163 @@
+// Helper functions
+{
+	// Exceptions
+	var VariableNotFoundError = function(line, column, variable) {
+		this.name = "VariableNotFoundError";
+		this.message = '[' + line + ':' + column + '] Variable ' + variable + ' is not defined';
+		this.line = line;
+		this.column = column;
+		this.variable = variable;
+	};
+	VariableNotFoundError.prototype = Error.prototype;
+	
+	var VariableDuplicatedError = function(line, column, variable) {
+		this.name = "VariableDuplicatedError";
+		this.message = '[' + line + ':' + column + '] Variable ' + variable + ' is already defined';
+		this.line = line;
+		this.column = column;
+		this.variable = variable;
+	};
+	VariableDuplicatedError.prototype = Error.prototype;
+	
+	var NotANumberError = function(line, column, expr) {
+		this.name = "NotANumberError";
+		this.message = '[' + line + ':' + column + '] Expression ' + JSON.stringify(expr) + ' is not a number';
+		this.line = line;
+		this.column = column;
+		this.expr = expr;
+	};
+	NotANumberError.prototype = Error.prototype;
+	
+	var NotABooleanError = function(line, column, expr) {
+		this.name = "NotABooleanError";
+		this.message = '[' + line + ':' + column + '] Expression ' + JSON.stringify(expr) + ' is not a boolean';
+		this.line = line;
+		this.column = column;
+		this.expr = expr;
+	};
+	NotABooleanError.prototype = Error.prototype;
+	
+	var NotAListError = function(line, column, expr) {
+		this.name = "NotAListError";
+		this.message = '[' + line + ':' + column + '] Expression ' + JSON.stringify(expr) + ' is not a list';
+		this.line = line;
+		this.column = column;
+		this.expr = expr;
+	};
+	NotAListError.prototype = Error.prototype;
+
+	// Variable array
+	var variables = [];
+	var define = false;
+	
+	// Functions
+	function toogleDefine() {
+		define = !define;
+		return true;
+	}	
+	
+	function defineVariable(line, column, variable) {
+		if(variables.indexOf(variable) !== -1) {
+			throw new VariableDuplicatedError(line, column, variable);
+		}
+		variables.push(variable);
+	}
+	
+	function isBoolean(line, column, variable) {
+		if(['#t','#f'].indexOf(variable) !== -1) {
+			return true;
+		}
+		return false;
+	}
+	
+	function checkVariable(line, column, variable) {
+		if(!define && variables.indexOf(variable) === -1) {
+			throw new VariableNotFoundError(line, column, variable);
+		}
+		return true;
+	}
+	
+	function checkNumber(line, column, expr) {
+		if(typeof expr === 'number') {
+			return true;
+		}
+		if(typeof expr === 'string') {
+			if(!isBoolean(line, column, expr)) {
+				return checkVariable(line, column, expr);
+			}
+		}
+		if(typeof expr === 'object') {
+			var subExpr = expr[0];
+			if(subExpr !== undefined) {
+				if(['+','-','*','/'].indexOf(subExpr) !== -1) {
+					return true;
+				}
+				if('quote' === subExpr) {
+					return checkNumber(line, column, expr[1]);
+				}
+			}
+		}
+		throw new NotANumberError(line, column, expr);
+	}
+	
+	function checkBoolean(line, column, expr) {
+		if(typeof expr === 'string') {
+			if(isBoolean(line, column, expr)) {
+				return true;
+			}
+		}
+		if(typeof expr === 'object') {
+			var subExpr = expr[0];
+			if(subExpr !== undefined) {
+				if(['=','<'].indexOf(subExpr) !== -1) {
+					return true;
+				}
+				if('quote' === subExpr) {
+					return checkBoolean(line, column, expr[1]);
+				}
+			}
+		}
+		throw new NotABooleanError(line, column, expr);
+	}
+	
+	function checkList(line, column, expr) {
+		if(typeof expr === 'object') {
+			var subExpr = expr[0];
+			if(subExpr !== undefined) {
+				if('quote' === subExpr) {
+					return checkList(line, column, expr[1]);
+				}
+				if(['=','<','+','*','=','-','/','begin','define','set','if'].indexOf(subExpr) !== -1) {
+					throw new NotAListError(line, column, expr);
+				}
+				return true;
+			}
+		}
+		throw new NotAListError(line, column, expr);
+	}
+	
+}
+
+// Start rule
 start = _* e:expr _* {return e;}
 
 // Production rules
-expr 	= e:(begin / arith / logic / cons / car / cdr / define / set / if / quote / list / number / atom / boolean) {return e;}
-begin	= SP BEGIN _+ start:expr rest:(_+ e:expr {return e;})* EP {return ['begin'].concat([start].concat(rest));} 
-arith 	= SP op:ARITH _+ left:expr _+ right:expr EP {return [op, left, right];}
-logic	= SP op:LOGIC _+ left:expr _+ right:expr EP {return [op, left, right];}
-define 	= SP op:DEFINE _+ a:atom _+	e:expr EP {return [op, a, e];} 
-set 	= SP op:SET _+ a:atom _+ e:expr EP {return [op, a, e];} 
-cons	= SP op:CONS _+ left:expr _+ right:expr	EP {return [op, left, right];}
-car 	= SP op:CAR _+ e:expr EP {return [op, e];}
-cdr 	= SP op:CDR _+ e:expr EP {return [op, e];}
-if 		= SP op:IF _+ cond:expr _+ left:expr _+ right:expr EP {return [op, cond, left, right];} 
-list	= SP start:expr rest:(_+ e:expr {return e;})* EP {return rest.length == 0 ? start : [start].concat(rest);} 
-quote 	= SP op:QUOTE _+ e:expr EP {return [op, e];}
-	/ QUOTE2 _* e:expr {return ['quote', e];}
-number 	= sign:[+-]? int:[0-9]+ '.' float:[0-9]+  {return parseFloat(sign + int.join('') + '.' + float.join(''));}
-	/ sign:[+-]? int:[0-9]+ {return parseInt(sign + int.join(''));}
-atom 	= r:!(TOKEN) a:(a:[a-zA-Z] b:[a-zA-Z0-9]* {return a + b.join('');}) {return a;}
+expr 	= e:(begin / arith / logic / cons / car / cdr / define / set / if / quote / list / number / atom / boolean) { return e; }
+begin	= SP BEGIN _+ start:expr rest:(_+ e:expr {return e;})* EP { return ['begin'].concat([start].concat(rest)); } 
+arith 	= SP op:ARITH _+ left:expr _+ right:expr EP &{ return checkNumber(line, column, left) && checkNumber(line, column, right); } { return [op, left, right]; }
+logic	= SP op:LOGIC _+ left:expr _+ right:expr EP &{ return checkNumber(line, column, left) && checkNumber(line, column, right); }{ return [op, left, right]; }
+define 	= SP op:DEFINE _+ &{ return toogleDefine(); } a:atom &{ return toogleDefine(); } _+ e:expr EP &{ return checkNumber(line, column, e); } { defineVariable(line, column, a); return [op, a, e]; } 
+set 	= SP op:SET _+ a:atom _+ e:expr EP &{ return checkNumber(line, column, e); } { return [op, a, e]; } 
+cons	= SP op:CONS _+ left:expr _+ right:expr	EP &{ return checkList(line, column, right); } { return [op, left, right]; }
+car 	= SP op:CAR _+ e:expr EP &{ return checkList(line, column, e); } { return [op, e]; }
+cdr 	= SP op:CDR _+ e:expr EP &{ return checkList(line, column, e); } { return [op, e]; }
+if 		= SP op:IF _+ cond:expr _+ left:expr _+ right:expr EP &{ return checkBoolean(line, column, cond); } { return [op, cond, left, right]; } 
+list	= SP start:expr rest:(_+ e:expr {return e;})* EP { return [start].concat(rest); } 
+quote 	= SP op:QUOTE _+ e:(list / atom) EP { return [op, e]; }
+	/ QUOTE2 _* e:(list / atom) { return ['quote', e]; }
+number 	= sign:[+-]? int:[0-9]+ '.' float:[0-9]+  { return parseFloat(sign + int.join('') + '.' + float.join('')); }
+	/ sign:[+-]? int:[0-9]+ { return parseInt(sign + int.join('')); }
+atom 	= !(TOKEN) a:(a:[a-zA-Z] b:[a-zA-Z0-9]* {return a + b.join('');}) &{ return checkVariable(line, column, a); } { return a; }
 boolean	= TRUE / FALSE
 
 // Tokens

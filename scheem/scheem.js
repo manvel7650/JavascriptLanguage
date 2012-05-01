@@ -39,9 +39,6 @@ var scheem = (function(undefined) {
 			return false;
 		} else {
 			var value = env[expr];
-			if(value === undefined) {
-				throw new scheem.VariableNotFoundError(expr);
-			}
 			return value;
 		}
 	};
@@ -93,7 +90,7 @@ var scheem = (function(undefined) {
 				result = left === right;
 				break;
 		}
-		return result ? true : false;
+		return result ? '#t' : '#f';
 	};
 	
 	function QuoteHandler() {}
@@ -196,14 +193,6 @@ var scheem = (function(undefined) {
 	
 	scheem.UnknownExpression.prototype = Error.prototype;
   
-	scheem.VariableNotFoundError = function(variable) {
-		this.name = "VariableNotFoundError";
-		this.message = 'Variable ' + variable + ' is not defined, define it first';
-		this.variable = variable;
-	};
-  
-	scheem.VariableNotFoundError.prototype = Error.prototype;
-	
 	return scheem;
 })();
 
