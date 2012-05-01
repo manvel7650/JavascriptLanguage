@@ -45,6 +45,9 @@
 				</script>
 			</head>
 			<body>
+				<div id="header">
+					<h1 id="title"><xsl:value-of select="@title"/></h1>  
+				</div>
 				<div id="menu">
 					<table class="rootVoices">
 						<tr>
@@ -66,8 +69,12 @@
 						</tr>
 					</table>
 				</div>
-				<h1><xsl:value-of select="@title"/></h1>  
-				<xsl:apply-templates select="./block" />
+				<div id="content">
+					<xsl:apply-templates select="./block" />
+				</div>
+				<div id="footer">
+					Site built by Manuel Álvarez Álvarez
+				</div>
 			</body>
 		</html>
 	</xsl:template>
