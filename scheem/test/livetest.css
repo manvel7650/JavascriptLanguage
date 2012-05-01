@@ -1,0 +1,35 @@
+#cursor {
+	text-align: right;
+	background: none repeat scroll 0 0 #FFFFFF;
+	border-left: 1px solid #333333;
+	border-right: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	color: #000000;
+	padding: 2px 5px;
+}
+
+table#results {
+	display: none;
+	width: 100%;
+}
+
+td.tableHeader {
+	text-align: right;
+	font-weight: bold;
+	width: 3em;
+	padding: 2px 5px;
+}
+
+#parsed .error, #result .error{
+	border: 1px solid #993333;
+	color: #993333;
+	background-color: FFAAAA;
+	padding: 2px 5px;
+}
+
+#parsed .success, #result .success {
+	border: 1px solid #339933;
+	color: #339933;
+	background-color: AAFFAA;
+	padding: 2px 5px;
+}

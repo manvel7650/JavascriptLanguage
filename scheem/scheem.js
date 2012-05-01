@@ -9,11 +9,19 @@ var scheem = (function(undefined) {
 		},
 		parse : function (expr) {
 			return SCHEEM.parse(expr);
+		},
+		evalScheemString : function(expr) {
+			var parsed = this.parse(expr);
+			return this.evalScheem(parsed, {});
 		}
-	};	
+	};
 	
 	var evalScheem = function (expr, env) {
-		return typeHandlerMap[typeof expr].evalScheem(expr, env);
+		var handler = typeHandlerMap[typeof expr];
+		if(handler) 
+			return handler.evalScheem(expr, env);
+		else
+			throw new scheem.UnknownExpression(exp);
 	};
 	
 	function NumberHandler() {}
@@ -22,16 +30,30 @@ var scheem = (function(undefined) {
 		return parseInt(expr, 10);
 	};
 	
-	function VariableHandler() {}
+	function TokenHandler() {}
 	
-	VariableHandler.prototype.evalScheem = function(expr, env) {
-		return env[expr];
-	};	
+	TokenHandler.prototype.evalScheem = function(expr, env) {
+		if(expr === '#t') {
+			return true;
+		} else if(expr === '#f') {
+			return false;
+		} else {
+			var value = env[expr];
+			if(value === undefined) {
+				throw new scheem.VariableNotFoundError(expr);
+			}
+			return value;
+		}
+	};
 	
 	function ObjectHandler() {}
 	
 	ObjectHandler.prototype.evalScheem = function(expr, env) {
-		return arrayHandlerMap[expr[0]].evalScheem(expr, env);
+		var handler = arrayHandlerMap[expr[0]];
+		if(handler)
+			return handler.evalScheem(expr, env);
+		else
+			return arrayHandlerMap[null].evalScheem(expr, env);
 	};	
 	
 	function AritmeticalHandler() {}
@@ -71,7 +93,7 @@ var scheem = (function(undefined) {
 				result = left === right;
 				break;
 		}
-		return result ? '#t' : '#f';
+		return result ? true : false;
 	};
 	
 	function QuoteHandler() {}
@@ -132,8 +154,18 @@ var scheem = (function(undefined) {
 		return evalScheem(expr[isTrue ? 2 : 3], env);
 	};
 	
+	function ListHandler() {}
+	
+	ListHandler.prototype.evalScheem = function(expr, env) {
+		var result = [];
+		for(var item in expr) {
+			result[item] = evalScheem(expr[item], env);
+		}
+		return result;
+	};
+	
 	var typeHandlerMap = {
-		'string' : new VariableHandler(),
+		'string' : new TokenHandler(),
 		'number' : new NumberHandler(),
 		'object' : new ObjectHandler()
 	}
@@ -152,8 +184,25 @@ var scheem = (function(undefined) {
 		'cons' : new ConsHandler(),
 		'car' : new CarHandler(),
 		'cdr' : new CdrHandler(),
-		'if' : new IfHandler()
+		'if' : new IfHandler(),
+		null : new ListHandler()
 	};
+	
+	scheem.UnknownExpression = function(expr) {
+		this.name = "UnknownExpression";
+		this.message = 'Expression ' + expr + ' is unknown';
+		this.expr = expr;
+	};
+	
+	scheem.UnknownExpression.prototype = Error.prototype;
+  
+	scheem.VariableNotFoundError = function(variable) {
+		this.name = "VariableNotFoundError";
+		this.message = 'Variable ' + variable + ' is not defined, define it first';
+		this.variable = variable;
+	};
+  
+	scheem.VariableNotFoundError.prototype = Error.prototype;
 	
 	return scheem;
 })();

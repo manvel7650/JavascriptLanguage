@@ -90,7 +90,6 @@ suite('eval variable', function() {
 		);
 	});
 });
-
 suite('eval define,set!', function() {
 	var env = {x:2, y:3, z:10};	
 	test('evaluation of define test', function() {
@@ -151,7 +150,7 @@ suite('eval begin', function() {
 			1
 		);
 	});
-	test('(begin (set! x 5) (set! x (+ y x) x)) test', function() {
+	test('(begin (set! x 5) (set! x (+ y x)) x) test', function() {
 		assert.deepEqual(
 			scheem.evalScheem(['begin', ['set!', 'x', 5], ['set!', 'x', ['+', 'y', 'x']], 'x'], {x:1, y:2}),
 			7

@@ -1,13 +1,42 @@
-start = atom
+start = _* e:expr _* {return e;}
 
-atom = ignore* number:numberChar+ ignore* {return parseInt(number.join(""));}
-	/ ignore* atom:atomChar+ ignore* {return atom.join("");}
-	/ ignore* '\'' a:atom ignore* {return ['quote', a];}
-	/ ignore* '(' exp:atom+ ')' ignore* { return exp.length == 1 ? exp[0] : exp; }
+// Production rules
+expr 	= e:(begin / arith / logic / cons / car / cdr / define / set / if / quote / list / number / atom / boolean) {return e;}
+begin	= SP BEGIN _+ start:expr rest:(_+ e:expr {return e;})* EP {return ['begin'].concat([start].concat(rest));} 
+arith 	= SP op:ARITH _+ left:expr _+ right:expr EP {return [op, left, right];}
+logic	= SP op:LOGIC _+ left:expr _+ right:expr EP {return [op, left, right];}
+define 	= SP op:DEFINE _+ a:atom _+	e:expr EP {return [op, a, e];} 
+set 	= SP op:SET _+ a:atom _+ e:expr EP {return [op, a, e];} 
+cons	= SP op:CONS _+ left:expr _+ right:expr	EP {return [op, left, right];}
+car 	= SP op:CAR _+ e:expr EP {return [op, e];}
+cdr 	= SP op:CDR _+ e:expr EP {return [op, e];}
+if 		= SP op:IF _+ cond:expr _+ left:expr _+ right:expr EP {return [op, cond, left, right];} 
+list	= SP start:expr rest:(_+ e:expr {return e;})* EP {return rest.length == 0 ? start : [start].concat(rest);} 
+quote 	= SP op:QUOTE _+ e:expr EP {return [op, e];}
+	/ QUOTE2 _* e:expr {return ['quote', e];}
+number 	= sign:[+-]? int:[0-9]+ '.' float:[0-9]+  {return parseFloat(sign + int.join('') + '.' + float.join(''));}
+	/ sign:[+-]? int:[0-9]+ {return parseInt(sign + int.join(''));}
+atom 	= r:!(TOKEN) a:(a:[a-zA-Z] b:[a-zA-Z0-9]* {return a + b.join('');}) {return a;}
+boolean	= TRUE / FALSE
 
-ignore = comment / ignoreChar
-comment = ';;' [^\n\r]* eol
-numberChar = [0-9]
-atomChar = [0-9a-zA-Z_?!+=@#$%^&*/.-]
-ignoreChar = [ \t\n\r]
-eol = [\n\r]{1,2} / !. 
+// Tokens
+ARITH	= [+*/-]
+LOGIC	= [=<]
+EOL		= [\n\r]{1,2} / !.
+COMMENT	= ';;' [^\n\r]* EOL
+_		= WS / COMMENT
+WS		= [ \t\n\r] 
+BEGIN 	= 'begin'
+CONS 	= 'cons'
+CAR 	= 'car'
+CDR		= 'cdr'
+DEFINE	= 'define'
+SET		= 'set!'
+IF		= 'if'
+QUOTE	= 'quote'
+QUOTE2	= '\''
+TRUE	= '#t'
+FALSE	= '#f'
+TOKEN	= BEGIN / CONS / CAR / CDR / DEFINE / SET / IF / QUOTE / TRUE / FALSE
+SP		= '(' _* 
+EP		= _* ')'

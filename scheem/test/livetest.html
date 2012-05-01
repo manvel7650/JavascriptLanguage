@@ -1,0 +1,83 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Scheem Live Demo</title>
+		<script src="jquery-1.7.1.min.js"></script>
+		<script src="codemirror.js"></script>
+		<script src="scheme.js"></script>
+		<link rel="stylesheet" type="text/css" href="codemirror.css" />
+		<link rel="stylesheet" type="text/css" href="nojw.css" />
+		<script src="../scheem.js"></script>
+		<script src="../parser.js"></script>
+		<link rel="stylesheet" href="livetest.css" />
+		<script type="text/javascript">
+			var value = null;
+			
+			$(function() {
+				var cm_options = {
+					mode: 'scheme',
+					theme: 'nojw',
+					indentUnit: 4,
+					lineNumbers: true,
+					matchBrackets: true,
+					tabMode: "indent",
+					onCursorActivity : function () {
+						var pos = myEditor.getCursor();
+						$('#cursor').html((pos.line + 1) + ':' + (pos.ch + 1)); 
+					},
+					onChange : function(editor) {
+						value = editor.getValue();
+					}
+				};
+				var myEditor = CodeMirror.fromTextArea($('#code')[0], cm_options);
+			});
+			
+			function updateResults() {
+				if(value != null) {
+					var tempValue = value;
+					$('#results').fadeOut(function() {
+						try {
+							try {
+								var parsed = scheem.parse(tempValue);
+								$('#parsed').html('<p class="success">' + JSON.stringify(parsed) + '</p>');
+								try {
+									var result = scheem.evalScheem(parsed, {});
+									$('#result').html('<p class="success">' + JSON.stringify(result) + '</p>');
+								}
+								catch(e) {
+									$('#result').html('<p class="error">' + e + '</p>');
+								}
+							}
+							catch(e) {
+								$('#parsed').html('<p class="error">' + e + '</p>');
+								$('#result').html('');
+							}
+						}
+						finally {
+							$('#results').fadeIn();
+						}
+					});
+					
+				}
+				value = null;
+				window.setTimeout(updateResults, 2000);
+			}
+			
+			window.setTimeout(updateResults, 2000);
+		</script>
+	</head>
+	<body>
+		<textarea id="code">(+ 1 1)</textarea>
+		<div id="cursor">1:1</div>
+		<table id="results">
+			<tr>
+				<td class="tableHeader">Parsed</td>
+				<td id="parsed"></td>
+			</tr>
+			<tr>
+				<td class="tableHeader">Result</td>
+				<td id="result"></td>
+			</tr>
+		</table>
+	</body>
+</html>
