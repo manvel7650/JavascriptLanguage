@@ -39,6 +39,8 @@
 								  closeAfter:1000,
 								  submenuHoverIntent:200
 								});
+								
+							<xsl:apply-templates select="onLoad" />
 						});
 				</script>
 			</head>
@@ -50,10 +52,6 @@
 								<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_scheem'}</xsl:text></xsl:attribute>
 								Scheem
 							</td>
-							<td>
-								<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_mus'}</xsl:text></xsl:attribute>
-								Mus
-							</td>
 						</tr>
 					</table>
 				</div>				
@@ -62,16 +60,8 @@
 						<tr>
 							<td>
 								<div class="menuImage"><img src="./images/scheme.png" alt="Scheem" /></div>
-								<a href="./scheem_livetest.xml" target="_self">Live! test</a>
+								<a href="./scheem_livetest.xml" target="_self">Live!</a>
 								<a href="./scheem_webtest.xml" target="_self">Tests</a>
-							</td>
-						</tr>
-					</table>
-				</div>
-				<div id="menu_mus" class="mbmenu boxMenu">
-					<table>
-						<tr>
-							<td>
 							</td>
 						</tr>
 					</table>
@@ -97,7 +87,7 @@
 					<xsl:value-of select="@src"/>
 				</xsl:attribute>
 			</xsl:if>
-			<xsl:value-of select="."/>
+			<xsl:value-of select="." />
 		</script>
 	</xsl:template>
 	
@@ -110,8 +100,12 @@
 		<p><xsl:value-of select="."/></p>
 	</xsl:template>
 	
-	<xsl:template match="html">
+	<xsl:template match="htmlContent">
 		<xsl:copy-of select="./*" />
+	</xsl:template>
+	
+	<xsl:template match="onLoad">
+		<xsl:value-of select="." />
 	</xsl:template>
 	
 	<xsl:template match="editor">

@@ -47,7 +47,7 @@
 	<block title="Scheem Live Demo">
 		<text>Here we go with an unique Scheem editor. Try it!!!</text>
 		<editor id="scheem_code" mode="scheme" />
-		<html>
+		<htmlContent>
 			<table id="results">
 				<tr>
 					<td class="tableHeader">Parsed</td>
@@ -58,6 +58,6 @@
 					<td id="result"></td>
 				</tr>
 			</table>
-		</html>
+		</htmlContent>
 	</block>
 </page>

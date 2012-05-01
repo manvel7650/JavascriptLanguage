@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="template.xsl"?>
 <page title="PL101 Javascript Language">
+	<css href="./css/mocha.css"/>
+	<js src="./js/mocha.js" />
+	<js src="./js/chai.js" />
+	<js>mocha.setup('tdd');</js>
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/parser.js" />
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/scheem.js" />
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/parseScheemTest.js" />
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/evalScheemTest.js" />
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/evalScheemStringTest.js" />
+	<onLoad>mocha.run();</onLoad>
 	<block title="Mocha Tests">
+		<text>This are the tests for the parser and interpreter, sorry if some of them fail :(</text>
+		<htmlContent><div id="mocha"></div></htmlContent>
 	</block>
 </page>

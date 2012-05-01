@@ -8,19 +8,21 @@ td.tableHeader {
 	text-align: right;
 	font-weight: bold;
 	width: 3em;
-	padding: 2px 5px;
+	padding: 2px 10px;
 }
 
 #parsed .error, #result .error{
 	border: 1px solid #993333;
 	color: #993333;
-	background-color: FFAAAA !important;
-	padding: 2px 5px;
+	background-color: #FFAAAA;
+	padding: 2px 10px;
+	margin: 0;
 }
 
 #parsed .success, #result .success {
 	border: 1px solid #339933;
 	color: #339933;
-	background-color: AAFFAA !important;
-	padding: 2px 5px;
+	background-color: #AAFFAA;
+	padding: 2px 10px;
+	margin: 0;
 }
