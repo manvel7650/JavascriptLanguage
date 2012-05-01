@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="template.xsl"?>
+<page title="PL101 Javascript Language">
+	<css href="./css/livetest.css"/>
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/parser.js" />
+	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/scheem.js" />
+	<js>
+		var scheemCodeValue = null;
+		
+		function onChange_scheem_code(editor) {
+			scheemCodeValue = editor.getValue();
+		}
+		
+		function updateResults() {
+			if(scheemCodeValue != null) {
+				var tempValue = scheemCodeValue;
+				$('#results').fadeOut(function() {
+					try {
+						try {
+							var parsed = scheem.parse(tempValue);
+							$('#parsed').html('&lt;p class="success"&gt;' + JSON.stringify(parsed) + '&lt;/p&gt;');
+							try {
+								var result = scheem.evalScheem(parsed, {});
+								$('#result').html('&lt;p class="success"&gt;' + JSON.stringify(result) + '&lt;/p&gt;');
+							}
+							catch(e) {
+								$('#result').html('&lt;p class="error"&gt;' + e + '&lt;/p&gt;');
+							}
+						}
+						catch(e) {
+							$('#parsed').html('&lt;p class="error"&gt;' + e + '&lt;/p&gt;');
+							$('#result').html('');
+						}
+					}
+					finally {
+						$('#results').fadeIn();
+					}
+				});
+				
+			}
+			scheemCodeValue = null;
+			window.setTimeout(updateResults, 2000);
+		}
+		
+		window.setTimeout(updateResults, 2000);
+	</js>
+	<block title="Scheem Live Demo">
+		<text>Here we go with an unique Scheem editor. Try it!!!</text>
+		<editor id="scheem_code" mode="scheme" />
+		<html>
+			<table id="results">
+				<tr>
+					<td class="tableHeader">Parsed</td>
+					<td id="parsed"></td>
+				</tr>
+				<tr>
+					<td class="tableHeader">Result</td>
+					<td id="result"></td>
+				</tr>
+			</table>
+		</html>
+	</block>
+</page>

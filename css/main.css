@@ -1,4 +1,24 @@
 body {
-	margin: 0;
-	padding: 0;
+}
+
+table {
+	width: 100%;
+}
+
+div.menuImage {
+	text-align: center;
+}
+
+div.menuImage img {
+	width: 130px;
+}
+
+.cursor {
+	text-align: right;
+	background: none repeat scroll 0 0 #FFFFFF;
+	border-left: 1px solid #333333;
+	border-right: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	color: #000000;
+	padding: 2px 5px;
 }
