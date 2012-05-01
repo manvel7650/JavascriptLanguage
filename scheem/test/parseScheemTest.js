@@ -6,70 +6,58 @@ if (typeof module !== 'undefined') {
 }
 
 suite('parser', function() {
-	test('(a b c)', function() {
+	test('(1 2 3)', function() {
 		assert.deepEqual(
-			scheem.parse('(a b c)'),
-			['a', 'b', 'c']
+			scheem.parse('(1 2 3)'),
+			[1, 2, 3]
 		);
 	});
-	test('  (a  b      c  )  ', function() {
+	test('  (1  2      3  )  ', function() {
 		assert.deepEqual(
-			scheem.parse('  (a  b      c  )  '),
-			['a', 'b', 'c']
+			scheem.parse('  (1  2      3  )  '),
+			[1, 2, 3]
 		);
 	});
-	test('atom', function() {
+	test('(+ 2 3)', function() {
 		assert.deepEqual(
-			scheem.parse('atom'),
-			'atom'
+			scheem.parse('(+ 2 3)'),
+			['+', 2, 3]
 		);
 	});
-	test('  atom  ', function() {
+	test('(+ 1 (+ 2 3))', function() {
 		assert.deepEqual(
-			scheem.parse('  atom  '),
-			'atom'
+			scheem.parse('(+ 1 (+ 2 3))'),
+			['+', 1, ['+', 2, 3]]
 		);
 	});
-	test('(+ x 3)', function() {
+	test('(+ 1\n\t( +  2   3)\n)', function() {
 		assert.deepEqual(
-			scheem.parse('(+ x 3)'),
-			['+', 'x', 3]
+			scheem.parse('(+ 1\n\t( +  2   3)\n)'),
+			['+', 1, ['+', 2, 3]]
 		);
 	});
-	test('(+ 1 (+ x 3))', function() {
+	test('º', function() {
 		assert.deepEqual(
-			scheem.parse('(+ 1 (+ x 3))'),
-			['+', 1, ['+', 'x', 3]]
+			scheem.parse('(+ 1 \'(+ 2 3))'),
+			['+', 1, ['quote', ['+', 2, 3]]]
 		);
 	});
-	test('(+ 1\n\t( +  x   3)\n)', function() {
+	test('(+ 1\n\t\'\t( +  2   3)\n)', function() {
 		assert.deepEqual(
-			scheem.parse('(+ 1\n\t( +  x   3)\n)'),
-			['+', 1, ['+', 'x', 3]]
+			scheem.parse('(+ 1\n\t\'\t( +  2   3)\n)'),
+			['+', 1, ['quote', ['+', 2, 3]]]
 		);
 	});
-	test('(+ 1 \'(+ x 3))', function() {
+	test(';; This is a comment\n(+ 1 \'(+ 2 3))', function() {
 		assert.deepEqual(
-			scheem.parse('(+ 1 \'(+ x 3))'),
-			['+', 1, ['quote', ['+', 'x', 3]]]
+			scheem.parse(';; This is a comment\n(+ 1 \'(+ 2 3))'),
+			['+', 1, ['quote', ['+', 2, 3]]]
 		);
 	});
-	test('(+ 1\n\t\'\t( +  x   3)\n)', function() {
+	test('(+ 1 \n;; This is a comment\n\'(+ 2 3))', function() {
 		assert.deepEqual(
-			scheem.parse('(+ 1\n\t\'\t( +  x   3)\n)'),
-			['+', 1, ['quote', ['+', 'x', 3]]]
-		);
-	});
-	test(';; This is a comment\n(+ 1 \'(+ x 3))', function() {
-		assert.deepEqual(
-			scheem.parse(';; This is a comment\n(+ 1 \'(+ x 3))'),
-			['+', 1, ['quote', ['+', 'x', 3]]]
-		);
-	});
-	test('(+ 1 \n;; This is a comment\n\'(+ x 3))', function() {
-		assert.deepEqual(
-			scheem.parse('(+ 1 \n;; This is a comment\n\'(+ x 3))'),
-			['+', 1, ['quote', ['+', 'x', 3]]]
+			scheem.parse('(+ 1 \n;; This is a comment\n\'(+ 2 3))'),
+			['+', 1, ['quote', ['+', 2, 3]]]
 		);
 	});
 });
@@ -82,8 +70,8 @@ suite('parse quote', function() {
 	});
 	test('an atom', function() {
 		assert.deepEqual(
-			scheem.parse('\'dog'),
-			['quote', 'dog']
+			scheem.parse('(begin (define dog 3) \'dog)'),
+			['begin', ['define', 'dog', 3], ['quote', 'dog']]
 		);
 	});
 	test('a list', function() {
@@ -100,7 +88,7 @@ suite('parse quote', function() {
 	});
 	test('(quote (quote (+ 2 3))) test', function() {
 		assert.deepEqual(
-			scheem.parse('\'(\'(+ 2 3))'),
+			scheem.parse('\'\'(+ 2 3)'),
 			['quote', ['quote', ['+', 2, 3]]]
 		);
 	});
@@ -137,26 +125,6 @@ suite('parse +-*/', function() {
 		);
 	});
 });
-suite('parse variable', function() {
-	test('x test', function() {
-		assert.deepEqual(
-			scheem.parse('x'),
-			'x'
-		);
-	});
-	test('(* y 3) test', function() {
-		assert.deepEqual(
-			scheem.parse('(* y 3)'),
-			['*', 'y', 3]
-		);
-	});
-	test('(/ z (+ x y)) test', function() {
-		assert.deepEqual(
-			scheem.parse('(/ z (+ x y))'),
-			['/', 'z', ['+', 'x', 'y']]
-		);
-	});
-});
 suite('parse define,set!', function() {
 	test('evaluation of define test', function() {
 		assert.deepEqual(
@@ -166,14 +134,14 @@ suite('parse define,set!', function() {
 	});	
 	test('evaluation of set test', function() {
 		assert.deepEqual(
-			scheem.parse('(set! a 1)'),
-			['set!', 'a', 1]
+			scheem.parse('(begin (define a 3) (set! a 1))'),
+			['begin', ['define', 'a', 3], ['set!', 'a', 1]]
 		);
 	});
-	test('(set! y (+ x 1)) test', function() {
+	test('(begin (define y 3) (set! y (+ 2 1))) test', function() {
 		assert.deepEqual(
-			scheem.parse('(set! y (+ x 1))'),
-			['set!', 'y', ['+', 'x', 1]]
+			scheem.parse('(begin (define y 3) (set! y (+ 2 1)))'),
+			['begin', ['define', 'y', 3], ['set!', 'y', ['+', 2, 1]]]
 		);
 	});	
 });
@@ -190,16 +158,10 @@ suite('parse begin', function() {
 			['begin', ['+', 2, 2]]
 		);
 	});
-	test('(begin x y x) test', function() {
+	test('(begin (define x 2) (set! x 5) (set! x (+ y x)) x) test', function() {
 		assert.deepEqual(
-			scheem.parse('(begin x y x)'),
-			['begin', 'x', 'y', 'x']
-		);
-	});
-	test('(begin (set! x 5) (set! x (+ y x)) x) test', function() {
-		assert.deepEqual(
-			scheem.parse('(begin (set! x 5) (set! x (+ y x)) x)'),
-			['begin', ['set!', 'x', 5], ['set!', 'x', ['+', 'y', 'x']], 'x']
+			scheem.parse('(begin (define x 2) (set! x 5) (set! x (+ 2 x)) x)'),
+			['begin', ['define', 'x', 2], ['set!', 'x', 5], ['set!', 'x', ['+', 2, 'x']], 'x']
 		);
 	});
 });
@@ -262,16 +224,16 @@ suite('parse if', function() {
 			['if', ['=', 1, 0], 2, 3]
 		);
 	});
-	test('(if (= 1 1) 2 error) test', function() {
+	test('(if (= 1 1) 2 3) test', function() {
 		assert.deepEqual(
-			scheem.parse('(if (= 1 1) 2 error)'),
-			['if', ['=', 1, 1], 2, 'error']
+			scheem.parse('(if (= 1 1) 2 3)'),
+			['if', ['=', 1, 1], 2, 3]
 		);
 	});
 	test('(if (= 1 1) error 3) test', function() {
 		assert.deepEqual(
-			scheem.parse('(if (= 1 1) error 3)'),
-			['if', ['=', 1, 1], 'error', 3]
+			scheem.parse('(if (= 1 1) 2 3)'),
+			['if', ['=', 1, 1], 2, 3]
 		);
 	});
 	test('(if (= 1 1) (if (= 2 3) 10 11) 12) test', function() {

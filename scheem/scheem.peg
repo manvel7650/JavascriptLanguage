@@ -153,8 +153,8 @@ car 	= SP op:CAR _+ e:expr EP &{ return checkList(line, column, e); } { return [
 cdr 	= SP op:CDR _+ e:expr EP &{ return checkList(line, column, e); } { return [op, e]; }
 if 		= SP op:IF _+ cond:expr _+ left:expr _+ right:expr EP &{ return checkBoolean(line, column, cond); } { return [op, cond, left, right]; } 
 list	= SP start:expr rest:(_+ e:expr {return e;})* EP { return [start].concat(rest); } 
-quote 	= SP op:QUOTE _+ e:(list / atom) EP { return [op, e]; }
-	/ QUOTE2 _* e:(list / atom) { return ['quote', e]; }
+quote 	= SP op:QUOTE _+ e:(quote / list / atom / arith / logic / number) EP { return [op, e]; }
+	/ QUOTE2 _* e:(quote / list / atom / arith / logic / number) { return ['quote', e]; }
 number 	= sign:[+-]? int:[0-9]+ '.' float:[0-9]+  { return parseFloat(sign + int.join('') + '.' + float.join('')); }
 	/ sign:[+-]? int:[0-9]+ { return parseInt(sign + int.join('')); }
 atom 	= !(TOKEN) a:(a:[a-zA-Z] b:[a-zA-Z0-9]* {return a + b.join('');}) &{ return checkVariable(line, column, a); } { return a; }

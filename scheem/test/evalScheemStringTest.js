@@ -1,5 +1,6 @@
 if (typeof module !== 'undefined') {
 	var scheem = require('../scheem.js');
+	var SCHEEM = require('../parser.js');
 	var assert = require('chai').assert;
 	var expect = require('chai').expect;
 } else {
@@ -28,38 +29,6 @@ suite('interpreter', function() {
 			function() { scheem.evalScheemString('(+ x 3)') }
 		).to.throw(
 			SCHEEM.VariableNotFoundError
-		);
-	});
-});
-suite('interpret quote', function() {
-	test('a number', function() {
-		assert.deepEqual(
-			scheem.evalScheemString('\'3'),
-			3
-		);
-	});
-	test('an atom', function() {
-		assert.deepEqual(
-			scheem.evalScheemString('\'dog'),
-			'dog'
-		);
-	});
-	test('a list', function() {
-		assert.deepEqual(
-			scheem.evalScheemString('\'(1 2 3)'),
-			[1, 2, 3]
-		);
-	});
-	test('(quote (+ 2 3)) test', function() {
-		assert.deepEqual(
-			scheem.evalScheemString('\'(+ 2 3)'),
-			['+', 2, 3]
-		);
-	});
-	test('(quote (quote (+ 2 3))) test', function() {
-		assert.deepEqual(
-			scheem.evalScheemString('\'(\'(+ 2 3))'),
-			['quote', ['+', 2, 3]]
 		);
 	});
 });

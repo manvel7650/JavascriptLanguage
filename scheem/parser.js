@@ -1151,9 +1151,21 @@ var SCHEEM = (function(){
               result2 = null;
             }
             if (result2 !== null) {
-              result3 = parse_list();
+              result3 = parse_quote();
               if (result3 === null) {
-                result3 = parse_atom();
+                result3 = parse_list();
+                if (result3 === null) {
+                  result3 = parse_atom();
+                  if (result3 === null) {
+                    result3 = parse_arith();
+                    if (result3 === null) {
+                      result3 = parse_logic();
+                      if (result3 === null) {
+                        result3 = parse_number();
+                      }
+                    }
+                  }
+                }
               }
               if (result3 !== null) {
                 result4 = parse_EP();
@@ -1197,9 +1209,21 @@ var SCHEEM = (function(){
               result2 = parse__();
             }
             if (result1 !== null) {
-              result2 = parse_list();
+              result2 = parse_quote();
               if (result2 === null) {
-                result2 = parse_atom();
+                result2 = parse_list();
+                if (result2 === null) {
+                  result2 = parse_atom();
+                  if (result2 === null) {
+                    result2 = parse_arith();
+                    if (result2 === null) {
+                      result2 = parse_logic();
+                      if (result2 === null) {
+                        result2 = parse_number();
+                      }
+                    }
+                  }
+                }
               }
               if (result2 !== null) {
                 result0 = [result0, result1, result2];
@@ -2151,7 +2175,6 @@ var SCHEEM = (function(){
   
   return result;
 })();
-
 
 if (typeof module !== "undefined") {
 	module.exports = SCHEEM;
