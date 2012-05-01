@@ -10,9 +10,10 @@
 	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/parseScheemTest.js" />
 	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/evalScheemTest.js" />
 	<js src="https://raw.github.com/manvel7650/JavascriptLanguage/master/scheem/test/evalScheemStringTest.js" />
-	<onLoad>mocha.run();</onLoad>
+	<load>mocha.run();</load>
 	<block title="Mocha Tests">
-		<text>This are the tests for the parser and interpreter, sorry if some of them fail :(</text>
-		<htmlContent><div id="mocha"></div></htmlContent>
+		<markup>
+			<div id="mocha" />
+		</markup>
 	</block>
 </page>

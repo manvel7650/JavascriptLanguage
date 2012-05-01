@@ -40,13 +40,13 @@
 								  submenuHoverIntent:200
 								});
 								
-							<xsl:apply-templates select="onLoad" />
+							<xsl:apply-templates select="load" />
 						});
 				</script>
 			</head>
 			<body>
 				<div id="header">
-					<h1 id="title"><xsl:value-of select="@title"/></h1>  
+					<h1 id="title"><a href="index.xml"><xsl:value-of select="@title"/></a></h1>  
 				</div>
 				<div id="menu">
 					<table class="rootVoices">
@@ -70,7 +70,7 @@
 					</table>
 				</div>
 				<div id="content">
-					<xsl:apply-templates select="./block" />
+					<xsl:apply-templates select="block" />
 				</div>
 				<div id="footer">
 					Site built by Manuel Álvarez Álvarez
@@ -103,15 +103,15 @@
 		<xsl:apply-templates  />
 	</xsl:template>
 	
-	<xsl:template match="text">
+	<xsl:template match="p">
 		<p><xsl:value-of select="."/></p>
 	</xsl:template>
 	
-	<xsl:template match="htmlContent">
+	<xsl:template match="markup">
 		<xsl:copy-of select="./*" />
 	</xsl:template>
 	
-	<xsl:template match="onLoad">
+	<xsl:template match="load">
 		<xsl:value-of select="." />
 	</xsl:template>
 	

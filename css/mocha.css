@@ -119,8 +119,8 @@ div#mocha {
   padding: 15px;
   border: 1px solid #eee;
   border-bottom-color: #ddd;
-  -webkit-border-radius: 3px;
-  -webkit-box-shadow: 0 1px 3px #eee;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px #eee;
 }
 
 #error {
@@ -138,6 +138,10 @@ div#mocha {
   margin: 0;
   color: #888;
   background-color: white;
+  padding: 5px 0 0 0;
+  border: 1px solid black;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px #111111;
 }
 
 #stats .progress {
