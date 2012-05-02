@@ -36,7 +36,7 @@ suite('parser', function() {
 			['+', 1, ['+', 2, 3]]
 		);
 	});
-	test('º', function() {
+	test('(+ 1 \'(+ 2 3))', function() {
 		assert.deepEqual(
 			scheem.parse('(+ 1 \'(+ 2 3))'),
 			['+', 1, ['quote', ['+', 2, 3]]]
