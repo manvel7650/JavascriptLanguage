@@ -14,66 +14,56 @@
 				<script type="text/javascript" src="./js/jquery.metadata.js"></script>
 				<script type="text/javascript" src="./js/mbMenu.js"></script>
 				<script type="text/javascript" src="./js/codemirror.js"></script>
-				<script type="text/javascript" src="./js/scheme.js"></script>				
-				<xsl:apply-templates select="js" />				
+				<script type="text/javascript" src="./js/scheme.js"></script>
+				<script type="text/javascript" src="./js/main.js"></script>
+				<xsl:apply-templates select="js" />
 				<script type="text/javascript">
 						$(function(){
-							$("#menu").buildMenu(
-								{
-								  menuWidth:200,
-								  openOnRight:false,
-								  menuSelector: ".menuContainer",
-								  iconPath:"ico/",
-								  hasImages:true,
-								  fadeInTime:100,
-								  fadeOutTime:300,
-								  adjustLeft:2,
-								  minZindex:"auto",
-								  adjustTop:10,
-								  opacity:.95,
-								  shadow:false,
-								  shadowColor:"#ccc",
-								  hoverIntent:0,
-								  openOnClick:true,
-								  closeOnMouseOut:false,
-								  closeAfter:1000,
-								  submenuHoverIntent:200
-								});
-								
+							setupMenu($('#menu'));
 							<xsl:apply-templates select="load" />
+							<xsl:for-each select="//editor">
+								setupEditor(
+									$('#<xsl:value-of select="@id" />'), 
+									$('#cursor_<xsl:value-of select="@id" />'), 
+									'<xsl:value-of select="@mode" />',
+									onChange_<xsl:value-of select="@id" />
+								);
+							</xsl:for-each>
 						});
 				</script>
 			</head>
 			<body>
-				<div id="header">
-					<h1 id="title"><a href="index.xml"><xsl:value-of select="@title"/></a></h1>  
-				</div>
-				<div id="menu">
-					<table class="rootVoices">
-						<tr>
-							<td>
-								<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_scheem'}</xsl:text></xsl:attribute>
-								Scheem
-							</td>
-						</tr>
-					</table>
-				</div>				
-				<div id="menu_scheem" class="mbmenu boxMenu">
-					<table>
-						<tr>
-							<td>
-								<div class="menuImage"><img src="./images/scheme.png" alt="Scheem" /></div>
-								<a href="./scheem_livetest.xml" target="_self">Live!</a>
-								<a href="./scheem_webtest.xml" target="_self">Tests</a>
-							</td>
-						</tr>
-					</table>
-				</div>
-				<div id="content">
-					<xsl:apply-templates select="block" />
-				</div>
-				<div id="footer">
-					Site built by Manuel Álvarez Álvarez
+				<div id="wrapper">
+					<div id="header">
+						<h1 id="title"><a href="index.xml"><xsl:value-of select="@title"/></a></h1>  
+					</div>
+					<div id="menu">
+						<table class="rootVoices">
+							<tr>
+								<td>
+									<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_scheem'}</xsl:text></xsl:attribute>
+									Scheem
+								</td>
+							</tr>
+						</table>
+					</div>				
+					<div id="menu_scheem" class="mbmenu boxMenu">
+						<table>
+							<tr>
+								<td>
+									<div class="menuImage"><img src="./images/scheme.png" alt="Scheem" /></div>
+									<a href="./scheem_livetest.xml" target="_self">Live!</a>
+									<a href="./scheem_webtest.xml" target="_self">Tests</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="content">
+						<xsl:apply-templates select="block" />
+					</div>
+					<div id="footer">
+						Site built by Manuel Álvarez Álvarez
+					</div>
 				</div>
 			</body>
 		</html>
@@ -107,7 +97,7 @@
 		<p><xsl:value-of select="."/></p>
 	</xsl:template>
 	
-	<xsl:template match="markup">
+	<xsl:template match="html">
 		<xsl:copy-of select="./*" />
 	</xsl:template>
 	
@@ -124,24 +114,6 @@
 			<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
 			1:1
 		</div>
-		<script type="text/javascript">
-			var cm_options_<xsl:value-of select="@id" /> = {
-				mode: '<xsl:value-of select="@mode" />',
-				theme: 'nojw',
-				indentUnit: 4,
-				lineNumbers: true,
-				matchBrackets: true,
-				tabMode: "indent",
-				onCursorActivity : function () {
-					var pos = <xsl:value-of select="@id" />Editor.getCursor();
-					$('#cursor_<xsl:value-of select="@id" />').html((pos.line + 1) + ':' + (pos.ch + 1)); 
-				},
-				onChange : function(editor) {
-					onChange_<xsl:value-of select="@id" />(editor);
-				}
-			};
-			var <xsl:value-of select="@id" />Editor = CodeMirror.fromTextArea($('#<xsl:value-of select="@id" />')[0], cm_options_<xsl:value-of select="@id" />);
-			</script>
 	</xsl:template>
 	
 </xsl:stylesheet> 
