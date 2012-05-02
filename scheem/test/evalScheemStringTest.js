@@ -31,4 +31,10 @@ suite('interpreter', function() {
 			SCHEEM.VariableNotFoundError
 		);
 	});
+	test('(begin (define a 1) (define b 2) (if (< a b) (1 a) (2 b)))', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define a 1) (define b 2) (if (< a b) (1 a) (2 b)))'),
+			[1, 1]
+		);
+	});
 });
