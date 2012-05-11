@@ -380,22 +380,24 @@ suite('eval let', function() {
 		);
 	});
 });
-suite('eval alert', function() {
-	test('(alert \'hello-world)  test', function() {
-		assert.deepEqual(
-			scheem.evalScheem(['alert', ['quote', 'hello-world']], { }),
-			'hello-world'
+if (typeof module !== 'undefined') {
+	suite('eval alert', function() {
+		test('(alert \'hello-world)  test', function() {
+			assert.deepEqual(
+				scheem.evalScheem(['alert', ['quote', 'hello-world']], { }),
+				'hello-world'
+			);
+		});
+		expect(
+			function() { scheem.evalScheem(['alert', 'hello-world'], { }) }
+		).to.throw(
+			scheem.VariableNotFoundError
 		);
+		test('(alert (+ 3 2))  test', function() {
+			assert.deepEqual(
+				scheem.evalScheem(['alert', ['+', 3, 2]], { }),
+				5
+			);
+		});
 	});
-	expect(
-		function() { scheem.evalScheem(['alert', 'hello-world'], { }) }
-	).to.throw(
-		scheem.VariableNotFoundError
-	);
-	test('(alert (+ 3 2))  test', function() {
-		assert.deepEqual(
-			scheem.evalScheem(['alert', ['+', 3, 2]], { }),
-			5
-		);
-	});
-});
+}

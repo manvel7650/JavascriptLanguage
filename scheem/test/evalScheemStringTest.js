@@ -14,8 +14,7 @@ suite('interpreter', function() {
 		).to.throw(
 			SCHEEM.VariableNotFoundError
 		);
-	});
-	
+	});	
 	test('atom', function() {
 		expect(
 			function() { scheem.evalScheemString('atom') }
