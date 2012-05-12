@@ -7,6 +7,7 @@ if (typeof module !== 'undefined') {
 	var assert = chai.assert;
 	var expect = chai.expect;
 }
+/*
 suite('interpreter', function() {
 	test('(a b c)', function() {
 		expect(
@@ -36,3 +37,4 @@ suite('interpreter', function() {
 		);
 	});
 });
+*/

@@ -106,6 +106,13 @@ var scheem = (function(undefined) {
 			var result = arguments[0] < arguments[1];
 			return result ? '#t' : '#f';;
 		},
+		'list': function() {
+			var result = [];
+			for(var i=0; i<arguments.length; i++) {
+				result.push(arguments(i));
+			}
+			return result;
+		},
 		'cons': function() {
 			if(arguments.length !== 2) 
 				throw new ArgumentCountError('cons', 2, arguments.length); 

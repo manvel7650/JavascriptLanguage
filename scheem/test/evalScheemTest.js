@@ -312,7 +312,7 @@ suite('eval lambda', function() {
 			8
 		);
 	});
-	test('(((lambda (x) (lambda x (+ x x))) 5) 3) test', function() {
+	test('(((lambda (x) (lambda (x) (+ x x))) 5) 3) test', function() {
 		assert.deepEqual(
 			scheem.evalScheem([[['lambda', ['x'], ['lambda', ['x'], ['+', 'x', 'x']]], 5], 3], { }),
 			6
@@ -363,7 +363,7 @@ suite('eval lambda', function() {
 			25
 		);
 	});	
-	test('(begin (define delegate (lambda (n) (n))) (define plusone (lambda (n) (+ n 1))) ((delegate plusone) 4)) test', function() {
+	test('(begin (define delegate (lambda (n) n)) (define plusone (lambda (n) (+ n 1))) ((delegate plusone) 4)) test', function() {
 	assert.deepEqual(
 			scheem.evalScheem(['begin', ['define', 'delegate', ['lambda', ['n'], 'n']], ['define', 'plusone', ['lambda', ['n'], ['+', 'n', 1]]], [['delegate', 'plusone'], 4]], {}),
 			5
@@ -382,14 +382,14 @@ suite('eval let', function() {
 });
 if (typeof module !== 'undefined') {
 	suite('eval alert', function() {
-		test('(alert \'hello-world)  test', function() {
+		test('(alert \'helloWorld)  test', function() {
 			assert.deepEqual(
-				scheem.evalScheem(['alert', ['quote', 'hello-world']], { }),
-				'hello-world'
+				scheem.evalScheem(['alert', ['quote', 'helloWorld']], { }),
+				'helloWorld'
 			);
 		});
 		expect(
-			function() { scheem.evalScheem(['alert', 'hello-world'], { }) }
+			function() { scheem.evalScheem(['alert', 'helloWorld'], { }) }
 		).to.throw(
 			scheem.VariableNotFoundError
 		);
