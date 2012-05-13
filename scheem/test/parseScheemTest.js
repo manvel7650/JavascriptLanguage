@@ -198,6 +198,12 @@ suite('parse cons,car,cdr', function() {
 			['cdr', ['list', ['list', 1, 2], 3, 4]]
 		);
 	});	
+	test('(length \'(1 2 3 4)) test', function() {
+		assert.deepEqual(
+			scheem.parse('(length \'(1 2 3 4))'),
+			['length', ['quote', [1, 2, 3, 4]]]
+		);
+	});	
 });
 suite('parse if', function() {
 	test('(if (= 1 1) 2 3) test', function() {

@@ -204,6 +204,12 @@ suite('eval cons,car,cdr', function() {
 			[3, 4]
 		);
 	});	
+	test('(length \'(1 2 3 4)) test', function() {
+		assert.deepEqual(
+			scheem.evalScheem(['length', ['quote', [1, 2, 3, 4]]], {}),
+			4
+		);
+	});	
 });
 suite('eval if', function() {
 	test('(if (= 1 1) 2 3) test', function() {

@@ -79,9 +79,9 @@ var SCHEEM = (function(){
         startRule = "start";
       }
       
-      var pos = 0;
+      var pos = { offset: 0, line: 1, column: 1, seenCR: false };
       var reportFailures = 0;
-      var rightmostFailuresPos = 0;
+      var rightmostFailuresPos = { offset: 0, line: 1, column: 1, seenCR: false };
       var rightmostFailuresExpected = [];
       
       function padLeft(input, padding, length) {
@@ -111,13 +111,43 @@ var SCHEEM = (function(){
         return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
       }
       
+      function clone(object) {
+        var result = {};
+        for (var key in object) {
+          result[key] = object[key];
+        }
+        return result;
+      }
+      
+      function advance(pos, n) {
+        var endOffset = pos.offset + n;
+        
+        for (var offset = pos.offset; offset < endOffset; offset++) {
+          var ch = input.charAt(offset);
+          if (ch === "\n") {
+            if (!pos.seenCR) { pos.line++; }
+            pos.column = 1;
+            pos.seenCR = false;
+          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
+            pos.line++;
+            pos.column = 1;
+            pos.seenCR = true;
+          } else {
+            pos.column++;
+            pos.seenCR = false;
+          }
+        }
+        
+        pos.offset += n;
+      }
+      
       function matchFailed(failure) {
-        if (pos < rightmostFailuresPos) {
+        if (pos.offset < rightmostFailuresPos.offset) {
           return;
         }
         
-        if (pos > rightmostFailuresPos) {
-          rightmostFailuresPos = pos;
+        if (pos.offset > rightmostFailuresPos.offset) {
+          rightmostFailuresPos = clone(pos);
           rightmostFailuresExpected = [];
         }
         
@@ -128,8 +158,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = [];
         result1 = parse__();
         while (result1 !== null) {
@@ -149,21 +179,21 @@ var SCHEEM = (function(){
               result0 = [result0, result1, result2];
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, e) {return e;})(pos0, result0[1]);
+          result0 = (function(offset, line, column, e) {return e;})(pos0.offset, pos0.line, pos0.column, result0[1]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -172,7 +202,7 @@ var SCHEEM = (function(){
         var result0;
         var pos0;
         
-        pos0 = pos;
+        pos0 = clone(pos);
         result0 = parse_begin();
         if (result0 === null) {
           result0 = parse_define();
@@ -205,10 +235,10 @@ var SCHEEM = (function(){
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset, e) { return e; })(pos0, result0);
+          result0 = (function(offset, line, column, e) { return e; })(pos0.offset, pos0.line, pos0.column, result0);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -217,8 +247,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_BEGIN();
@@ -241,29 +271,29 @@ var SCHEEM = (function(){
                   result0 = [result0, result1, result2, result3, result4];
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, e) { return [op].concat(e); })(pos0, result0[1], result0[3]);
+          result0 = (function(offset, line, column, op, e) { return [op].concat(e); })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -272,13 +302,13 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3;
         var pos0, pos1, pos2, pos3;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_expr();
         if (result0 !== null) {
           result1 = [];
-          pos2 = pos;
-          pos3 = pos;
+          pos2 = clone(pos);
+          pos3 = clone(pos);
           result3 = parse__();
           if (result3 !== null) {
             result2 = [];
@@ -295,22 +325,22 @@ var SCHEEM = (function(){
               result2 = [result2, result3];
             } else {
               result2 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
           } else {
             result2 = null;
-            pos = pos3;
+            pos = clone(pos3);
           }
           if (result2 !== null) {
-            result2 = (function(offset, e) {return e;})(pos2, result2[1]);
+            result2 = (function(offset, line, column, e) {return e;})(pos2.offset, pos2.line, pos2.column, result2[1]);
           }
           if (result2 === null) {
-            pos = pos2;
+            pos = clone(pos2);
           }
           while (result2 !== null) {
             result1.push(result2);
-            pos2 = pos;
-            pos3 = pos;
+            pos2 = clone(pos);
+            pos3 = clone(pos);
             result3 = parse__();
             if (result3 !== null) {
               result2 = [];
@@ -327,34 +357,34 @@ var SCHEEM = (function(){
                 result2 = [result2, result3];
               } else {
                 result2 = null;
-                pos = pos3;
+                pos = clone(pos3);
               }
             } else {
               result2 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
             if (result2 !== null) {
-              result2 = (function(offset, e) {return e;})(pos2, result2[1]);
+              result2 = (function(offset, line, column, e) {return e;})(pos2.offset, pos2.line, pos2.column, result2[1]);
             }
             if (result2 === null) {
-              pos = pos2;
+              pos = clone(pos2);
             }
           }
           if (result1 !== null) {
             result0 = [result0, result1];
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, start, rest) { return [start].concat(rest); })(pos0, result0[0], result0[1]);
+          result0 = (function(offset, line, column, start, rest) { return [start].concat(rest); })(pos0.offset, pos0.line, pos0.column, result0[0], result0[1]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -363,8 +393,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4, result5, result6;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_DEFINE();
@@ -400,37 +430,37 @@ var SCHEEM = (function(){
                       result0 = [result0, result1, result2, result3, result4, result5, result6];
                     } else {
                       result0 = null;
-                      pos = pos1;
+                      pos = clone(pos1);
                     }
                   } else {
                     result0 = null;
-                    pos = pos1;
+                    pos = clone(pos1);
                   }
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, a, e) { return [op, a, e]; })(pos0, result0[1], result0[3], result0[5]);
+          result0 = (function(offset, line, column, op, a, e) { return [op, a, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3], result0[5]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -439,8 +469,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4, result5, result6;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_SET();
@@ -476,37 +506,37 @@ var SCHEEM = (function(){
                       result0 = [result0, result1, result2, result3, result4, result5, result6];
                     } else {
                       result0 = null;
-                      pos = pos1;
+                      pos = clone(pos1);
                     }
                   } else {
                     result0 = null;
-                    pos = pos1;
+                    pos = clone(pos1);
                   }
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, a, e) { return [op, a, e]; })(pos0, result0[1], result0[3], result0[5]);
+          result0 = (function(offset, line, column, op, a, e) { return [op, a, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3], result0[5]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -515,8 +545,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4, result5, result6, result7, result8;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_LAMBDA();
@@ -556,45 +586,45 @@ var SCHEEM = (function(){
                           result0 = [result0, result1, result2, result3, result4, result5, result6, result7, result8];
                         } else {
                           result0 = null;
-                          pos = pos1;
+                          pos = clone(pos1);
                         }
                       } else {
                         result0 = null;
-                        pos = pos1;
+                        pos = clone(pos1);
                       }
                     } else {
                       result0 = null;
-                      pos = pos1;
+                      pos = clone(pos1);
                     }
                   } else {
                     result0 = null;
-                    pos = pos1;
+                    pos = clone(pos1);
                   }
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, a, e) { return [op, a, e]; })(pos0, result0[1], result0[4], result0[7]);
+          result0 = (function(offset, line, column, op, a, e) { return [op, a, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[4], result0[7]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -603,8 +633,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4, result5, result6, result7, result8;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_IF();
@@ -653,45 +683,45 @@ var SCHEEM = (function(){
                           result0 = [result0, result1, result2, result3, result4, result5, result6, result7, result8];
                         } else {
                           result0 = null;
-                          pos = pos1;
+                          pos = clone(pos1);
                         }
                       } else {
                         result0 = null;
-                        pos = pos1;
+                        pos = clone(pos1);
                       }
                     } else {
                       result0 = null;
-                      pos = pos1;
+                      pos = clone(pos1);
                     }
                   } else {
                     result0 = null;
-                    pos = pos1;
+                    pos = clone(pos1);
                   }
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, cond, left, right) { return [op, cond, left, right]; })(pos0, result0[1], result0[3], result0[5], result0[7]);
+          result0 = (function(offset, line, column, op, cond, left, right) { return [op, cond, left, right]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3], result0[5], result0[7]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -700,8 +730,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_QUOTE();
@@ -724,33 +754,33 @@ var SCHEEM = (function(){
                   result0 = [result0, result1, result2, result3, result4];
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, e) { return [op, e]; })(pos0, result0[1], result0[3]);
+          result0 = (function(offset, line, column, op, e) { return [op, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         if (result0 === null) {
-          pos0 = pos;
-          pos1 = pos;
+          pos0 = clone(pos);
+          pos1 = clone(pos);
           result0 = parse_QUOTE2();
           if (result0 !== null) {
             result1 = parse_expr();
@@ -758,17 +788,17 @@ var SCHEEM = (function(){
               result0 = [result0, result1];
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
           if (result0 !== null) {
-            result0 = (function(offset, e) { return ['quote', e]; })(pos0, result0[1]);
+            result0 = (function(offset, line, column, e) { return ['quote', e]; })(pos0.offset, pos0.line, pos0.column, result0[1]);
           }
           if (result0 === null) {
-            pos = pos0;
+            pos = clone(pos0);
           }
         }
         return result0;
@@ -778,8 +808,8 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_FUNC();
@@ -808,29 +838,29 @@ var SCHEEM = (function(){
                   result0 = [result0, result1, result2, result3, result4];
                 } else {
                   result0 = null;
-                  pos = pos1;
+                  pos = clone(pos1);
                 }
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, op, e) { return [op].concat(e); })(pos0, result0[1], result0[3]);
+          result0 = (function(offset, line, column, op, e) { return [op].concat(e); })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -839,15 +869,15 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4;
         var pos0, pos1, pos2, pos3;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_SP();
         if (result0 !== null) {
           result1 = parse_expr();
           if (result1 !== null) {
             result2 = [];
-            pos2 = pos;
-            pos3 = pos;
+            pos2 = clone(pos);
+            pos3 = clone(pos);
             result4 = parse__();
             if (result4 !== null) {
               result3 = [];
@@ -864,22 +894,22 @@ var SCHEEM = (function(){
                 result3 = [result3, result4];
               } else {
                 result3 = null;
-                pos = pos3;
+                pos = clone(pos3);
               }
             } else {
               result3 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
             if (result3 !== null) {
-              result3 = (function(offset, e) {return e;})(pos2, result3[1]);
+              result3 = (function(offset, line, column, e) {return e;})(pos2.offset, pos2.line, pos2.column, result3[1]);
             }
             if (result3 === null) {
-              pos = pos2;
+              pos = clone(pos2);
             }
             while (result3 !== null) {
               result2.push(result3);
-              pos2 = pos;
-              pos3 = pos;
+              pos2 = clone(pos);
+              pos3 = clone(pos);
               result4 = parse__();
               if (result4 !== null) {
                 result3 = [];
@@ -896,17 +926,17 @@ var SCHEEM = (function(){
                   result3 = [result3, result4];
                 } else {
                   result3 = null;
-                  pos = pos3;
+                  pos = clone(pos3);
                 }
               } else {
                 result3 = null;
-                pos = pos3;
+                pos = clone(pos3);
               }
               if (result3 !== null) {
-                result3 = (function(offset, e) {return e;})(pos2, result3[1]);
+                result3 = (function(offset, line, column, e) {return e;})(pos2.offset, pos2.line, pos2.column, result3[1]);
               }
               if (result3 === null) {
-                pos = pos2;
+                pos = clone(pos2);
               }
             }
             if (result2 !== null) {
@@ -915,25 +945,25 @@ var SCHEEM = (function(){
                 result0 = [result0, result1, result2, result3];
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, start, rest) { return [start].concat(rest); })(pos0, result0[1], result0[2]);
+          result0 = (function(offset, line, column, start, rest) { return [start].concat(rest); })(pos0.offset, pos0.line, pos0.column, result0[1], result0[2]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -942,11 +972,11 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
         
-        pos0 = pos;
-        pos1 = pos;
-        if (/^[+\-]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
+        if (/^[+\-]/.test(input.charAt(pos.offset))) {
+          result0 = input.charAt(pos.offset);
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -955,9 +985,9 @@ var SCHEEM = (function(){
         }
         result0 = result0 !== null ? result0 : "";
         if (result0 !== null) {
-          if (/^[0-9]/.test(input.charAt(pos))) {
-            result2 = input.charAt(pos);
-            pos++;
+          if (/^[0-9]/.test(input.charAt(pos.offset))) {
+            result2 = input.charAt(pos.offset);
+            advance(pos, 1);
           } else {
             result2 = null;
             if (reportFailures === 0) {
@@ -968,9 +998,9 @@ var SCHEEM = (function(){
             result1 = [];
             while (result2 !== null) {
               result1.push(result2);
-              if (/^[0-9]/.test(input.charAt(pos))) {
-                result2 = input.charAt(pos);
-                pos++;
+              if (/^[0-9]/.test(input.charAt(pos.offset))) {
+                result2 = input.charAt(pos.offset);
+                advance(pos, 1);
               } else {
                 result2 = null;
                 if (reportFailures === 0) {
@@ -982,9 +1012,9 @@ var SCHEEM = (function(){
             result1 = null;
           }
           if (result1 !== null) {
-            if (input.charCodeAt(pos) === 46) {
+            if (input.charCodeAt(pos.offset) === 46) {
               result2 = ".";
-              pos++;
+              advance(pos, 1);
             } else {
               result2 = null;
               if (reportFailures === 0) {
@@ -992,9 +1022,9 @@ var SCHEEM = (function(){
               }
             }
             if (result2 !== null) {
-              if (/^[0-9]/.test(input.charAt(pos))) {
-                result4 = input.charAt(pos);
-                pos++;
+              if (/^[0-9]/.test(input.charAt(pos.offset))) {
+                result4 = input.charAt(pos.offset);
+                advance(pos, 1);
               } else {
                 result4 = null;
                 if (reportFailures === 0) {
@@ -1005,9 +1035,9 @@ var SCHEEM = (function(){
                 result3 = [];
                 while (result4 !== null) {
                   result3.push(result4);
-                  if (/^[0-9]/.test(input.charAt(pos))) {
-                    result4 = input.charAt(pos);
-                    pos++;
+                  if (/^[0-9]/.test(input.charAt(pos.offset))) {
+                    result4 = input.charAt(pos.offset);
+                    advance(pos, 1);
                   } else {
                     result4 = null;
                     if (reportFailures === 0) {
@@ -1022,32 +1052,32 @@ var SCHEEM = (function(){
                 result0 = [result0, result1, result2, result3];
               } else {
                 result0 = null;
-                pos = pos1;
+                pos = clone(pos1);
               }
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, sign, int, float) { return parseFloat(sign + int.join('') + '.' + float.join('')); })(pos0, result0[0], result0[1], result0[3]);
+          result0 = (function(offset, line, column, sign, int, float) { return parseFloat(sign + int.join('') + '.' + float.join('')); })(pos0.offset, pos0.line, pos0.column, result0[0], result0[1], result0[3]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         if (result0 === null) {
-          pos0 = pos;
-          pos1 = pos;
-          if (/^[+\-]/.test(input.charAt(pos))) {
-            result0 = input.charAt(pos);
-            pos++;
+          pos0 = clone(pos);
+          pos1 = clone(pos);
+          if (/^[+\-]/.test(input.charAt(pos.offset))) {
+            result0 = input.charAt(pos.offset);
+            advance(pos, 1);
           } else {
             result0 = null;
             if (reportFailures === 0) {
@@ -1056,9 +1086,9 @@ var SCHEEM = (function(){
           }
           result0 = result0 !== null ? result0 : "";
           if (result0 !== null) {
-            if (/^[0-9]/.test(input.charAt(pos))) {
-              result2 = input.charAt(pos);
-              pos++;
+            if (/^[0-9]/.test(input.charAt(pos.offset))) {
+              result2 = input.charAt(pos.offset);
+              advance(pos, 1);
             } else {
               result2 = null;
               if (reportFailures === 0) {
@@ -1069,9 +1099,9 @@ var SCHEEM = (function(){
               result1 = [];
               while (result2 !== null) {
                 result1.push(result2);
-                if (/^[0-9]/.test(input.charAt(pos))) {
-                  result2 = input.charAt(pos);
-                  pos++;
+                if (/^[0-9]/.test(input.charAt(pos.offset))) {
+                  result2 = input.charAt(pos.offset);
+                  advance(pos, 1);
                 } else {
                   result2 = null;
                   if (reportFailures === 0) {
@@ -1086,17 +1116,17 @@ var SCHEEM = (function(){
               result0 = [result0, result1];
             } else {
               result0 = null;
-              pos = pos1;
+              pos = clone(pos1);
             }
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
           if (result0 !== null) {
-            result0 = (function(offset, sign, int) { return parseInt(sign + int.join('')); })(pos0, result0[0], result0[1]);
+            result0 = (function(offset, line, column, sign, int) { return parseInt(sign + int.join('')); })(pos0.offset, pos0.line, pos0.column, result0[0], result0[1]);
           }
           if (result0 === null) {
-            pos = pos0;
+            pos = clone(pos0);
           }
         }
         return result0;
@@ -1106,9 +1136,9 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3;
         var pos0, pos1, pos2, pos3;
         
-        pos0 = pos;
-        pos1 = pos;
-        pos2 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
+        pos2 = clone(pos);
         reportFailures++;
         result0 = parse_TOKEN();
         reportFailures--;
@@ -1116,14 +1146,14 @@ var SCHEEM = (function(){
           result0 = "";
         } else {
           result0 = null;
-          pos = pos2;
+          pos = clone(pos2);
         }
         if (result0 !== null) {
-          pos2 = pos;
-          pos3 = pos;
-          if (/^[a-zA-Z]/.test(input.charAt(pos))) {
-            result1 = input.charAt(pos);
-            pos++;
+          pos2 = clone(pos);
+          pos3 = clone(pos);
+          if (/^[a-zA-Z]/.test(input.charAt(pos.offset))) {
+            result1 = input.charAt(pos.offset);
+            advance(pos, 1);
           } else {
             result1 = null;
             if (reportFailures === 0) {
@@ -1132,9 +1162,9 @@ var SCHEEM = (function(){
           }
           if (result1 !== null) {
             result2 = [];
-            if (/^[a-zA-Z0-9]/.test(input.charAt(pos))) {
-              result3 = input.charAt(pos);
-              pos++;
+            if (/^[a-zA-Z0-9]/.test(input.charAt(pos.offset))) {
+              result3 = input.charAt(pos.offset);
+              advance(pos, 1);
             } else {
               result3 = null;
               if (reportFailures === 0) {
@@ -1143,9 +1173,9 @@ var SCHEEM = (function(){
             }
             while (result3 !== null) {
               result2.push(result3);
-              if (/^[a-zA-Z0-9]/.test(input.charAt(pos))) {
-                result3 = input.charAt(pos);
-                pos++;
+              if (/^[a-zA-Z0-9]/.test(input.charAt(pos.offset))) {
+                result3 = input.charAt(pos.offset);
+                advance(pos, 1);
               } else {
                 result3 = null;
                 if (reportFailures === 0) {
@@ -1157,33 +1187,33 @@ var SCHEEM = (function(){
               result1 = [result1, result2];
             } else {
               result1 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
           } else {
             result1 = null;
-            pos = pos3;
+            pos = clone(pos3);
           }
           if (result1 !== null) {
-            result1 = (function(offset, a, b) {return a + b.join('');})(pos2, result1[0], result1[1]);
+            result1 = (function(offset, line, column, a, b) {return a + b.join('');})(pos2.offset, pos2.line, pos2.column, result1[0], result1[1]);
           }
           if (result1 === null) {
-            pos = pos2;
+            pos = clone(pos2);
           }
           if (result1 !== null) {
             result0 = [result0, result1];
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, a) { return a; })(pos0, result0[1]);
+          result0 = (function(offset, line, column, a) { return a; })(pos0.offset, pos0.line, pos0.column, result0[1]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -1192,13 +1222,13 @@ var SCHEEM = (function(){
         var result0, result1, result2, result3;
         var pos0, pos1, pos2, pos3;
         
-        pos0 = pos;
-        pos1 = pos;
+        pos0 = clone(pos);
+        pos1 = clone(pos);
         result0 = parse_atom();
         if (result0 !== null) {
           result1 = [];
-          pos2 = pos;
-          pos3 = pos;
+          pos2 = clone(pos);
+          pos3 = clone(pos);
           result3 = parse__();
           if (result3 !== null) {
             result2 = [];
@@ -1215,22 +1245,22 @@ var SCHEEM = (function(){
               result2 = [result2, result3];
             } else {
               result2 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
           } else {
             result2 = null;
-            pos = pos3;
+            pos = clone(pos3);
           }
           if (result2 !== null) {
-            result2 = (function(offset, a) {return a;})(pos2, result2[1]);
+            result2 = (function(offset, line, column, a) {return a;})(pos2.offset, pos2.line, pos2.column, result2[1]);
           }
           if (result2 === null) {
-            pos = pos2;
+            pos = clone(pos2);
           }
           while (result2 !== null) {
             result1.push(result2);
-            pos2 = pos;
-            pos3 = pos;
+            pos2 = clone(pos);
+            pos3 = clone(pos);
             result3 = parse__();
             if (result3 !== null) {
               result2 = [];
@@ -1247,34 +1277,34 @@ var SCHEEM = (function(){
                 result2 = [result2, result3];
               } else {
                 result2 = null;
-                pos = pos3;
+                pos = clone(pos3);
               }
             } else {
               result2 = null;
-              pos = pos3;
+              pos = clone(pos3);
             }
             if (result2 !== null) {
-              result2 = (function(offset, a) {return a;})(pos2, result2[1]);
+              result2 = (function(offset, line, column, a) {return a;})(pos2.offset, pos2.line, pos2.column, result2[1]);
             }
             if (result2 === null) {
-              pos = pos2;
+              pos = clone(pos2);
             }
           }
           if (result1 !== null) {
             result0 = [result0, result1];
           } else {
             result0 = null;
-            pos = pos1;
+            pos = clone(pos1);
           }
         } else {
           result0 = null;
-          pos = pos1;
+          pos = clone(pos1);
         }
         if (result0 !== null) {
-          result0 = (function(offset, start, rest) { return [start].concat(rest); })(pos0, result0[0], result0[1]);
+          result0 = (function(offset, line, column, start, rest) { return [start].concat(rest); })(pos0.offset, pos0.line, pos0.column, result0[0], result0[1]);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -1293,10 +1323,10 @@ var SCHEEM = (function(){
         var result0;
         var pos0;
         
-        pos0 = pos;
-        if (/^[\n\r]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
+        pos0 = clone(pos);
+        if (/^[\n\r]/.test(input.charAt(pos.offset))) {
+          result0 = input.charAt(pos.offset);
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1304,17 +1334,17 @@ var SCHEEM = (function(){
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {1,2})(pos0);
+          result0 = (function(offset, line, column) {1,2})(pos0.offset, pos0.line, pos0.column);
         }
         if (result0 === null) {
-          pos = pos0;
+          pos = clone(pos0);
         }
         if (result0 === null) {
-          pos0 = pos;
+          pos0 = clone(pos);
           reportFailures++;
-          if (input.length > pos) {
-            result0 = input.charAt(pos);
-            pos++;
+          if (input.length > pos.offset) {
+            result0 = input.charAt(pos.offset);
+            advance(pos, 1);
           } else {
             result0 = null;
             if (reportFailures === 0) {
@@ -1326,7 +1356,7 @@ var SCHEEM = (function(){
             result0 = "";
           } else {
             result0 = null;
-            pos = pos0;
+            pos = clone(pos0);
           }
         }
         return result0;
@@ -1336,10 +1366,10 @@ var SCHEEM = (function(){
         var result0, result1, result2;
         var pos0;
         
-        pos0 = pos;
-        if (input.substr(pos, 2) === ";;") {
+        pos0 = clone(pos);
+        if (input.substr(pos.offset, 2) === ";;") {
           result0 = ";;";
-          pos += 2;
+          advance(pos, 2);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1348,9 +1378,9 @@ var SCHEEM = (function(){
         }
         if (result0 !== null) {
           result1 = [];
-          if (/^[^\n\r]/.test(input.charAt(pos))) {
-            result2 = input.charAt(pos);
-            pos++;
+          if (/^[^\n\r]/.test(input.charAt(pos.offset))) {
+            result2 = input.charAt(pos.offset);
+            advance(pos, 1);
           } else {
             result2 = null;
             if (reportFailures === 0) {
@@ -1359,9 +1389,9 @@ var SCHEEM = (function(){
           }
           while (result2 !== null) {
             result1.push(result2);
-            if (/^[^\n\r]/.test(input.charAt(pos))) {
-              result2 = input.charAt(pos);
-              pos++;
+            if (/^[^\n\r]/.test(input.charAt(pos.offset))) {
+              result2 = input.charAt(pos.offset);
+              advance(pos, 1);
             } else {
               result2 = null;
               if (reportFailures === 0) {
@@ -1375,15 +1405,15 @@ var SCHEEM = (function(){
               result0 = [result0, result1, result2];
             } else {
               result0 = null;
-              pos = pos0;
+              pos = clone(pos0);
             }
           } else {
             result0 = null;
-            pos = pos0;
+            pos = clone(pos0);
           }
         } else {
           result0 = null;
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -1401,9 +1431,9 @@ var SCHEEM = (function(){
       function parse_WS() {
         var result0;
         
-        if (/^[ \t\n\r]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
+        if (/^[ \t\n\r]/.test(input.charAt(pos.offset))) {
+          result0 = input.charAt(pos.offset);
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1416,9 +1446,9 @@ var SCHEEM = (function(){
       function parse_BEGIN() {
         var result0;
         
-        if (input.substr(pos, 5) === "begin") {
+        if (input.substr(pos.offset, 5) === "begin") {
           result0 = "begin";
-          pos += 5;
+          advance(pos, 5);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1431,9 +1461,9 @@ var SCHEEM = (function(){
       function parse_DEFINE() {
         var result0;
         
-        if (input.substr(pos, 6) === "define") {
+        if (input.substr(pos.offset, 6) === "define") {
           result0 = "define";
-          pos += 6;
+          advance(pos, 6);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1446,9 +1476,9 @@ var SCHEEM = (function(){
       function parse_SET() {
         var result0;
         
-        if (input.substr(pos, 4) === "set!") {
+        if (input.substr(pos.offset, 4) === "set!") {
           result0 = "set!";
-          pos += 4;
+          advance(pos, 4);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1461,9 +1491,9 @@ var SCHEEM = (function(){
       function parse_IF() {
         var result0;
         
-        if (input.substr(pos, 2) === "if") {
+        if (input.substr(pos.offset, 2) === "if") {
           result0 = "if";
-          pos += 2;
+          advance(pos, 2);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1476,9 +1506,9 @@ var SCHEEM = (function(){
       function parse_QUOTE() {
         var result0;
         
-        if (input.substr(pos, 5) === "quote") {
+        if (input.substr(pos.offset, 5) === "quote") {
           result0 = "quote";
-          pos += 5;
+          advance(pos, 5);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1491,9 +1521,9 @@ var SCHEEM = (function(){
       function parse_QUOTE2() {
         var result0;
         
-        if (input.charCodeAt(pos) === 39) {
+        if (input.charCodeAt(pos.offset) === 39) {
           result0 = "'";
-          pos++;
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1506,9 +1536,9 @@ var SCHEEM = (function(){
       function parse_LAMBDA() {
         var result0;
         
-        if (input.substr(pos, 6) === "lambda") {
+        if (input.substr(pos.offset, 6) === "lambda") {
           result0 = "lambda";
-          pos += 6;
+          advance(pos, 6);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1521,9 +1551,9 @@ var SCHEEM = (function(){
       function parse_FUNC() {
         var result0;
         
-        if (input.charCodeAt(pos) === 43) {
+        if (input.charCodeAt(pos.offset) === 43) {
           result0 = "+";
-          pos++;
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1531,9 +1561,9 @@ var SCHEEM = (function(){
           }
         }
         if (result0 === null) {
-          if (input.charCodeAt(pos) === 42) {
+          if (input.charCodeAt(pos.offset) === 42) {
             result0 = "*";
-            pos++;
+            advance(pos, 1);
           } else {
             result0 = null;
             if (reportFailures === 0) {
@@ -1541,9 +1571,9 @@ var SCHEEM = (function(){
             }
           }
           if (result0 === null) {
-            if (input.charCodeAt(pos) === 47) {
+            if (input.charCodeAt(pos.offset) === 47) {
               result0 = "/";
-              pos++;
+              advance(pos, 1);
             } else {
               result0 = null;
               if (reportFailures === 0) {
@@ -1551,9 +1581,9 @@ var SCHEEM = (function(){
               }
             }
             if (result0 === null) {
-              if (input.charCodeAt(pos) === 45) {
+              if (input.charCodeAt(pos.offset) === 45) {
                 result0 = "-";
-                pos++;
+                advance(pos, 1);
               } else {
                 result0 = null;
                 if (reportFailures === 0) {
@@ -1561,9 +1591,9 @@ var SCHEEM = (function(){
                 }
               }
               if (result0 === null) {
-                if (input.charCodeAt(pos) === 61) {
+                if (input.charCodeAt(pos.offset) === 61) {
                   result0 = "=";
-                  pos++;
+                  advance(pos, 1);
                 } else {
                   result0 = null;
                   if (reportFailures === 0) {
@@ -1571,9 +1601,9 @@ var SCHEEM = (function(){
                   }
                 }
                 if (result0 === null) {
-                  if (input.charCodeAt(pos) === 60) {
+                  if (input.charCodeAt(pos.offset) === 60) {
                     result0 = "<";
-                    pos++;
+                    advance(pos, 1);
                   } else {
                     result0 = null;
                     if (reportFailures === 0) {
@@ -1581,9 +1611,9 @@ var SCHEEM = (function(){
                     }
                   }
                   if (result0 === null) {
-                    if (input.substr(pos, 4) === "list") {
+                    if (input.substr(pos.offset, 4) === "list") {
                       result0 = "list";
-                      pos += 4;
+                      advance(pos, 4);
                     } else {
                       result0 = null;
                       if (reportFailures === 0) {
@@ -1591,9 +1621,9 @@ var SCHEEM = (function(){
                       }
                     }
                     if (result0 === null) {
-                      if (input.substr(pos, 4) === "cons") {
+                      if (input.substr(pos.offset, 4) === "cons") {
                         result0 = "cons";
-                        pos += 4;
+                        advance(pos, 4);
                       } else {
                         result0 = null;
                         if (reportFailures === 0) {
@@ -1601,9 +1631,9 @@ var SCHEEM = (function(){
                         }
                       }
                       if (result0 === null) {
-                        if (input.substr(pos, 3) === "car") {
+                        if (input.substr(pos.offset, 3) === "car") {
                           result0 = "car";
-                          pos += 3;
+                          advance(pos, 3);
                         } else {
                           result0 = null;
                           if (reportFailures === 0) {
@@ -1611,9 +1641,9 @@ var SCHEEM = (function(){
                           }
                         }
                         if (result0 === null) {
-                          if (input.substr(pos, 3) === "cdr") {
+                          if (input.substr(pos.offset, 3) === "cdr") {
                             result0 = "cdr";
-                            pos += 3;
+                            advance(pos, 3);
                           } else {
                             result0 = null;
                             if (reportFailures === 0) {
@@ -1621,13 +1651,35 @@ var SCHEEM = (function(){
                             }
                           }
                           if (result0 === null) {
-                            if (input.substr(pos, 5) === "alert") {
-                              result0 = "alert";
-                              pos += 5;
+                            if (input.substr(pos.offset, 6) === "length") {
+                              result0 = "length";
+                              advance(pos, 6);
                             } else {
                               result0 = null;
                               if (reportFailures === 0) {
-                                matchFailed("\"alert\"");
+                                matchFailed("\"length\"");
+                              }
+                            }
+                            if (result0 === null) {
+                              if (input.substr(pos.offset, 6) === "append") {
+                                result0 = "append";
+                                advance(pos, 6);
+                              } else {
+                                result0 = null;
+                                if (reportFailures === 0) {
+                                  matchFailed("\"append\"");
+                                }
+                              }
+                              if (result0 === null) {
+                                if (input.substr(pos.offset, 5) === "alert") {
+                                  result0 = "alert";
+                                  advance(pos, 5);
+                                } else {
+                                  result0 = null;
+                                  if (reportFailures === 0) {
+                                    matchFailed("\"alert\"");
+                                  }
+                                }
                               }
                             }
                           }
@@ -1646,9 +1698,9 @@ var SCHEEM = (function(){
       function parse_TRUE() {
         var result0;
         
-        if (input.substr(pos, 2) === "#t") {
+        if (input.substr(pos.offset, 2) === "#t") {
           result0 = "#t";
-          pos += 2;
+          advance(pos, 2);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1661,9 +1713,9 @@ var SCHEEM = (function(){
       function parse_FALSE() {
         var result0;
         
-        if (input.substr(pos, 2) === "#f") {
+        if (input.substr(pos.offset, 2) === "#f") {
           result0 = "#f";
-          pos += 2;
+          advance(pos, 2);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1708,10 +1760,10 @@ var SCHEEM = (function(){
         var result0, result1, result2;
         var pos0;
         
-        pos0 = pos;
-        if (input.charCodeAt(pos) === 40) {
+        pos0 = clone(pos);
+        if (input.charCodeAt(pos.offset) === 40) {
           result0 = "(";
-          pos++;
+          advance(pos, 1);
         } else {
           result0 = null;
           if (reportFailures === 0) {
@@ -1729,11 +1781,11 @@ var SCHEEM = (function(){
             result0 = [result0, result1];
           } else {
             result0 = null;
-            pos = pos0;
+            pos = clone(pos0);
           }
         } else {
           result0 = null;
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -1742,7 +1794,7 @@ var SCHEEM = (function(){
         var result0, result1;
         var pos0;
         
-        pos0 = pos;
+        pos0 = clone(pos);
         result0 = [];
         result1 = parse__();
         while (result1 !== null) {
@@ -1750,9 +1802,9 @@ var SCHEEM = (function(){
           result1 = parse__();
         }
         if (result0 !== null) {
-          if (input.charCodeAt(pos) === 41) {
+          if (input.charCodeAt(pos.offset) === 41) {
             result1 = ")";
-            pos++;
+            advance(pos, 1);
           } else {
             result1 = null;
             if (reportFailures === 0) {
@@ -1763,11 +1815,11 @@ var SCHEEM = (function(){
             result0 = [result0, result1];
           } else {
             result0 = null;
-            pos = pos0;
+            pos = clone(pos0);
           }
         } else {
           result0 = null;
-          pos = pos0;
+          pos = clone(pos0);
         }
         return result0;
       }
@@ -1787,36 +1839,6 @@ var SCHEEM = (function(){
         return cleanExpected;
       }
       
-      function computeErrorPosition() {
-        /*
-         * The first idea was to use |String.split| to break the input up to the
-         * error position along newlines and derive the line and column from
-         * there. However IE's |split| implementation is so broken that it was
-         * enough to prevent it.
-         */
-        
-        var line = 1;
-        var column = 1;
-        var seenCR = false;
-        
-        for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
-          var ch = input.charAt(i);
-          if (ch === "\n") {
-            if (!seenCR) { line++; }
-            column = 1;
-            seenCR = false;
-          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
-            line++;
-            column = 1;
-            seenCR = true;
-          } else {
-            column++;
-            seenCR = false;
-          }
-        }
-        
-        return { line: line, column: column };
-      }
       
       
       var result = parseFunctions[startRule]();
@@ -1827,28 +1849,28 @@ var SCHEEM = (function(){
        * 1. The parser successfully parsed the whole input.
        *
        *    - |result !== null|
-       *    - |pos === input.length|
+       *    - |pos.offset === input.length|
        *    - |rightmostFailuresExpected| may or may not contain something
        *
        * 2. The parser successfully parsed only a part of the input.
        *
        *    - |result !== null|
-       *    - |pos < input.length|
+       *    - |pos.offset < input.length|
        *    - |rightmostFailuresExpected| may or may not contain something
        *
        * 3. The parser did not successfully parse any part of the input.
        *
        *   - |result === null|
-       *   - |pos === 0|
+       *   - |pos.offset === 0|
        *   - |rightmostFailuresExpected| contains at least one failure
        *
        * All code following this comment (including called functions) must
        * handle these states.
        */
-      if (result === null || pos !== input.length) {
-        var offset = Math.max(pos, rightmostFailuresPos);
+      if (result === null || pos.offset !== input.length) {
+        var offset = Math.max(pos.offset, rightmostFailuresPos.offset);
         var found = offset < input.length ? input.charAt(offset) : null;
-        var errorPosition = computeErrorPosition();
+        var errorPosition = pos.offset > rightmostFailuresPos.offset ? pos : rightmostFailuresPos;
         
         throw new this.SyntaxError(
           cleanupExpected(rightmostFailuresExpected),

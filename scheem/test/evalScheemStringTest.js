@@ -7,7 +7,7 @@ if (typeof module !== 'undefined') {
 	var assert = chai.assert;
 	var expect = chai.expect;
 }
-/*
+
 suite('interpreter', function() {
 	test('(a b c)', function() {
 		expect(
@@ -30,11 +30,29 @@ suite('interpreter', function() {
 			SCHEEM.VariableNotFoundError
 		);
 	});
-	test('(begin (define a 1) (define b 2) (if (< a b) (1 a) (2 b)))', function() {
+	test('(begin (define a 1) (define b 2) (if (< a b) (list 1 a) (list 2 b)))', function() {
 		assert.deepEqual(
-			scheem.evalScheemString('(begin (define a 1) (define b 2) (if (< a b) (1 a) (2 b)))'),
+			scheem.evalScheemString('(begin (define a 1) (define b 2) (if (< a b) (list 1 a) (list 2 b)))'),
 			[1, 1]
 		);
 	});
+	test('(begin (define factorial (lambda (n) (if (= n 0) 1 (* n (factorial (- n 1)))))) (factorial 5))', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define factorial (lambda (n) (if (= n 0) 1 (* n (factorial (- n 1)))))) (factorial 5))'),
+			120
+		);
+	});
+	test('(begin (define fibonacci (lambda (n) (if (< n 2) n (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))) (fibonacci 25))', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define fibonacci (lambda (n) (if (< n 2) n (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))) (fibonacci 10))'),
+			55
+		);
+	});
+	test('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n)))))	(reverse (list 1 2 3 4)))', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n)))))	(reverse (list 1 2 3 4)))'),
+			[4, 3, 2, 1]
+		);
+	});
+	
 });
-*/
