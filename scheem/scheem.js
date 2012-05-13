@@ -63,6 +63,8 @@ var scheem = (function(undefined) {
 				throw new ArgumentCountError('+', '>1', arguments.length); 
 			var result = arguments[0] + arguments[1];
 			for(var i = 2; i<arguments.length; i++) {
+				if(typeof arguments[i] !== 'number')
+					throw new NotANumberError(arguments[i]);				
 				result += arguments[i];
 			}
 			return result;
@@ -72,6 +74,8 @@ var scheem = (function(undefined) {
 				throw new ArgumentCountError('-', '>1', arguments.length); 
 			var result = arguments[0] - arguments[1];
 			for(var i = 2; i<arguments.length; i++) {
+				if(typeof arguments[i] !== 'number')
+					throw new NotANumberError(arguments[i]);	
 				result -= arguments[i];
 			}
 			return result;
@@ -81,6 +85,8 @@ var scheem = (function(undefined) {
 				throw new ArgumentCountError('*', '>1', arguments.length); 
 			var result = arguments[0] * arguments[1];
 			for(var i = 2; i<arguments.length; i++) {
+				if(typeof arguments[i] !== 'number')
+					throw new NotANumberError(arguments[i]);	
 				result *= arguments[i];
 			}
 			return result;
@@ -90,6 +96,8 @@ var scheem = (function(undefined) {
 				throw new ArgumentCountError('/', '>1', arguments.length); 
 			var result = arguments[0] / arguments[1];
 			for(var i = 2; i<arguments.length; i++) {
+				if(typeof arguments[i] !== 'number')
+					throw new NotANumberError(arguments[i]);	
 				result /= arguments[i];
 			}
 			return result;
@@ -128,6 +136,20 @@ var scheem = (function(undefined) {
 			if(arguments.length !== 1) 
 				throw new ArgumentCountError('cdr', 1, arguments.length);
 			return arguments[0].slice(1);
+		},
+		'length': function() {
+			if(arguments.length !== 1) 
+				throw new ArgumentCountError('length', 1, arguments.length);
+			return arguments[0].length;
+		},
+		'append': function() {
+			if(arguments.length < 2) 
+				throw new ArgumentCountError('append', '>1', arguments.length);
+			var result = [];
+			for(var i=0; i<arguments.length; i++) {
+				result = result.concat(arguments[i]);
+			}
+			return result;
 		},
 		'alert': function() {
 			if(arguments.length !== 1) 
@@ -216,7 +238,7 @@ var scheem = (function(undefined) {
 					throw new FunctionEvaluateError(result[0], e);
 				}
 			} else {
-				return result;
+				throw new NotAFunctionError(result[0]);
 			}
 		}
 	};
@@ -263,6 +285,22 @@ var scheem = (function(undefined) {
 	};
 	
     ArgumentCountError.prototype = Error.prototype;
+	
+	var NotANumberError = function(value) {
+		this.name = "NotANumberError";
+		this.message = 'Value ' + value + ' is not a number';
+		this.value = value;
+	};
+	
+    NotANumberError.prototype = Error.prototype;
+	
+	var NotAFunctionError = function(f) {
+		this.name = "NotAFunctionError";
+		this.message = 'Value ' + f + ' is not a function';
+		this.f = f;
+	};
+	
+    NotAFunctionError.prototype = Error.prototype;
 	
 	return scheem;
 })();

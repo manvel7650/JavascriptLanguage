@@ -31,7 +31,7 @@ IF		= 'if'
 QUOTE	= 'quote'
 QUOTE2	= '\''
 LAMBDA	= 'lambda'
-FUNC	= '+' / '*' / '/' / '-' / '=' / '<' / 'list' / 'cons' / 'car' / 'cdr' / 'alert'
+FUNC	= '+' / '*' / '/' / '-' / '=' / '<' / 'list' / 'cons' / 'car' / 'cdr' / 'length' / 'append' / 'alert'
 TRUE	= '#t'
 FALSE	= '#f'
 TOKEN	= BEGIN / DEFINE / SET / IF / QUOTE / LAMBDA/ FUNC / TRUE / FALSE
