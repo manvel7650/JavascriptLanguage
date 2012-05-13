@@ -48,11 +48,22 @@ suite('interpreter', function() {
 			55
 		);
 	});
-	test('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n)))))	(reverse (list 1 2 3 4)))', function() {
+	test('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n))))) (reverse (list 1 2 3 4)))', function() {
 		assert.deepEqual(
-			scheem.evalScheemString('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n)))))	(reverse (list 1 2 3 4)))'),
+			scheem.evalScheemString('(begin (define reverse (lambda (n) (if (= (length n) 1) n (append (reverse (cdr n)) (car n))))) (reverse (list 1 2 3 4)))'),
 			[4, 3, 2, 1]
 		);
 	});
-	
+	test('(begin (define l (list 4 3 56 7)) (define find (lambda (l n) (if (= (length l) 0) #f (if (= (car l) n) #t (find (cdr l) n))))) (find l 7))', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define l (list 4 3 56 7)) (define find (lambda (l n) (if (= (length l) 0) #f (if (= (car l) n) #t (find (cdr l) n))))) (find l 7))'),
+			'#t'
+		);
+	});
+	test('(begin (define l (list 1 2 3)) (define c 0) (define sum (lambda (n) (set! c (+ c n)))) (define exec (lambda (l f) (begin (f (car l)) (if (> (length l) 1) (exec (cdr l) f) l)))) (exec l sum) c)', function() {
+		assert.deepEqual(
+			scheem.evalScheemString('(begin (define l (list 1 2 3)) (define c 0) (define sum (lambda (n) (set! c (+ c n)))) (define exec (lambda (l f) (begin (f (car l)) (if (> (length l) 1) (exec (cdr l) f) l)))) (exec l sum) c)'),
+			6
+		);
+	});
 });
