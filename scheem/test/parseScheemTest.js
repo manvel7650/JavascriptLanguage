@@ -339,16 +339,14 @@ suite('parse lambda', function() {
 	
 	
 });
-/*
 suite('eval let', function() {
 	test('(let ((x (+ 3 1))) (+ (let ((x 3)) x) (let ((y 4)) x)))  test', function() {
 		assert.deepEqual(
-			scheem.evalScheem(['let', [['x', ['+', 3, 1]]], ['+', ['let',[['x', 3]], 'x'], ['let',[['y', 4]], 'x']]], { }),
-			7
+			scheem.parse('(let ((x (+ 3 1))) (+ (let ((x 3)) x) (let ((y 4)) x)))'),
+			['let', [['x', ['+', 3, 1]]], ['+', ['let',[['x', 3]], 'x'], ['let',[['y', 4]], 'x']]]
 		);
 	});
 });
-*/
 suite('parse alert', function() {
 	test('(alert \'helloWorld)  test', function() {
 		assert.deepEqual(

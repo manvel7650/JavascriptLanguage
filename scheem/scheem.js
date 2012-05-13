@@ -104,14 +104,38 @@ var scheem = (function(undefined) {
 		},	
 		'=': function() {
 			if(arguments.length !== 2) 
-				throw new ArgumentCountError('/', 2, arguments.length); 
+				throw new ArgumentCountError('=', 2, arguments.length); 
 			var result = arguments[0] === arguments[1];
+			return result ? '#t' : '#f';;
+		},
+		'!=': function() {
+			if(arguments.length !== 2) 
+				throw new ArgumentCountError('!=', 2, arguments.length); 
+			var result = arguments[0] !== arguments[1];
 			return result ? '#t' : '#f';;
 		},
 		'<': function() {
 			if(arguments.length !== 2) 
-				throw new ArgumentCountError('/', 2, arguments.length); 
+				throw new ArgumentCountError('<', 2, arguments.length); 
 			var result = arguments[0] < arguments[1];
+			return result ? '#t' : '#f';;
+		},
+		'<=': function() {
+			if(arguments.length !== 2) 
+				throw new ArgumentCountError('<=', 2, arguments.length); 
+			var result = arguments[0] <= arguments[1];
+			return result ? '#t' : '#f';;
+		},
+		'>': function() {
+			if(arguments.length !== 2) 
+				throw new ArgumentCountError('>', 2, arguments.length); 
+			var result = arguments[0] > arguments[1];
+			return result ? '#t' : '#f';;
+		},
+		'>=': function() {
+			if(arguments.length !== 2) 
+				throw new ArgumentCountError('>=', 2, arguments.length); 
+			var result = arguments[0] >= arguments[1];
 			return result ? '#t' : '#f';;
 		},
 		'list': function() {

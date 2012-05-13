@@ -40,6 +40,9 @@ var SCHEEM = (function(){
         "start": parse_start,
         "expr": parse_expr,
         "begin": parse_begin,
+        "let": parse_let,
+        "letVar": parse_letVar,
+        "letVLst": parse_letVLst,
         "eList": parse_eList,
         "define": parse_define,
         "set": parse_set,
@@ -57,6 +60,7 @@ var SCHEEM = (function(){
         "_": parse__,
         "WS": parse_WS,
         "BEGIN": parse_BEGIN,
+        "LET": parse_LET,
         "DEFINE": parse_DEFINE,
         "SET": parse_SET,
         "IF": parse_IF,
@@ -207,23 +211,26 @@ var SCHEEM = (function(){
         if (result0 === null) {
           result0 = parse_define();
           if (result0 === null) {
-            result0 = parse_set();
+            result0 = parse_let();
             if (result0 === null) {
-              result0 = parse_lambda();
+              result0 = parse_set();
               if (result0 === null) {
-                result0 = parse_if();
+                result0 = parse_lambda();
                 if (result0 === null) {
-                  result0 = parse_quote();
+                  result0 = parse_if();
                   if (result0 === null) {
-                    result0 = parse_func();
+                    result0 = parse_quote();
                     if (result0 === null) {
-                      result0 = parse_list();
+                      result0 = parse_func();
                       if (result0 === null) {
-                        result0 = parse_number();
+                        result0 = parse_list();
                         if (result0 === null) {
-                          result0 = parse_atom();
+                          result0 = parse_number();
                           if (result0 === null) {
-                            result0 = parse_boolean();
+                            result0 = parse_atom();
+                            if (result0 === null) {
+                              result0 = parse_boolean();
+                            }
                           }
                         }
                       }
@@ -291,6 +298,210 @@ var SCHEEM = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, line, column, op, e) { return [op].concat(e); })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3]);
+        }
+        if (result0 === null) {
+          pos = clone(pos0);
+        }
+        return result0;
+      }
+      
+      function parse_let() {
+        var result0, result1, result2, result3, result4, result5, result6;
+        var pos0, pos1;
+        
+        pos0 = clone(pos);
+        pos1 = clone(pos);
+        result0 = parse_SP();
+        if (result0 !== null) {
+          result1 = parse_LET();
+          if (result1 !== null) {
+            result2 = parse_SP();
+            if (result2 !== null) {
+              result3 = parse_letVar();
+              if (result3 !== null) {
+                result4 = parse_EP();
+                if (result4 !== null) {
+                  result5 = parse_expr();
+                  if (result5 !== null) {
+                    result6 = parse_EP();
+                    if (result6 !== null) {
+                      result0 = [result0, result1, result2, result3, result4, result5, result6];
+                    } else {
+                      result0 = null;
+                      pos = clone(pos1);
+                    }
+                  } else {
+                    result0 = null;
+                    pos = clone(pos1);
+                  }
+                } else {
+                  result0 = null;
+                  pos = clone(pos1);
+                }
+              } else {
+                result0 = null;
+                pos = clone(pos1);
+              }
+            } else {
+              result0 = null;
+              pos = clone(pos1);
+            }
+          } else {
+            result0 = null;
+            pos = clone(pos1);
+          }
+        } else {
+          result0 = null;
+          pos = clone(pos1);
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, line, column, op, v, e) { return [let, letVar, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3], result0[5]);
+        }
+        if (result0 === null) {
+          pos = clone(pos0);
+        }
+        return result0;
+      }
+      
+      function parse_letVar() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = clone(pos);
+        pos1 = clone(pos);
+        result0 = parse_SP();
+        if (result0 !== null) {
+          result1 = parse_atom();
+          if (result1 !== null) {
+            result3 = parse__();
+            if (result3 !== null) {
+              result2 = [];
+              while (result3 !== null) {
+                result2.push(result3);
+                result3 = parse__();
+              }
+            } else {
+              result2 = null;
+            }
+            if (result2 !== null) {
+              result3 = parse_expr();
+              if (result3 !== null) {
+                result4 = parse_EP();
+                if (result4 !== null) {
+                  result0 = [result0, result1, result2, result3, result4];
+                } else {
+                  result0 = null;
+                  pos = clone(pos1);
+                }
+              } else {
+                result0 = null;
+                pos = clone(pos1);
+              }
+            } else {
+              result0 = null;
+              pos = clone(pos1);
+            }
+          } else {
+            result0 = null;
+            pos = clone(pos1);
+          }
+        } else {
+          result0 = null;
+          pos = clone(pos1);
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, line, column, a, e) { return [a, e]; })(pos0.offset, pos0.line, pos0.column, result0[1], result0[3]);
+        }
+        if (result0 === null) {
+          pos = clone(pos0);
+        }
+        return result0;
+      }
+      
+      function parse_letVLst() {
+        var result0, result1, result2, result3;
+        var pos0, pos1, pos2, pos3;
+        
+        pos0 = clone(pos);
+        pos1 = clone(pos);
+        result0 = parse_letVar();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = clone(pos);
+          pos3 = clone(pos);
+          result3 = parse__();
+          if (result3 !== null) {
+            result2 = [];
+            while (result3 !== null) {
+              result2.push(result3);
+              result3 = parse__();
+            }
+          } else {
+            result2 = null;
+          }
+          if (result2 !== null) {
+            result3 = parse_letVar();
+            if (result3 !== null) {
+              result2 = [result2, result3];
+            } else {
+              result2 = null;
+              pos = clone(pos3);
+            }
+          } else {
+            result2 = null;
+            pos = clone(pos3);
+          }
+          if (result2 !== null) {
+            result2 = (function(offset, line, column, v) {return v;})(pos2.offset, pos2.line, pos2.column, result2[1]);
+          }
+          if (result2 === null) {
+            pos = clone(pos2);
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = clone(pos);
+            pos3 = clone(pos);
+            result3 = parse__();
+            if (result3 !== null) {
+              result2 = [];
+              while (result3 !== null) {
+                result2.push(result3);
+                result3 = parse__();
+              }
+            } else {
+              result2 = null;
+            }
+            if (result2 !== null) {
+              result3 = parse_letVar();
+              if (result3 !== null) {
+                result2 = [result2, result3];
+              } else {
+                result2 = null;
+                pos = clone(pos3);
+              }
+            } else {
+              result2 = null;
+              pos = clone(pos3);
+            }
+            if (result2 !== null) {
+              result2 = (function(offset, line, column, v) {return v;})(pos2.offset, pos2.line, pos2.column, result2[1]);
+            }
+            if (result2 === null) {
+              pos = clone(pos2);
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = clone(pos1);
+          }
+        } else {
+          result0 = null;
+          pos = clone(pos1);
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, line, column, start, rest) { return [start].concat(rest); })(pos0.offset, pos0.line, pos0.column, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = clone(pos0);
@@ -1458,6 +1669,21 @@ var SCHEEM = (function(){
         return result0;
       }
       
+      function parse_LET() {
+        var result0;
+        
+        if (input.substr(pos.offset, 3) === "let") {
+          result0 = "let";
+          advance(pos, 3);
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"let\"");
+          }
+        }
+        return result0;
+      }
+      
       function parse_DEFINE() {
         var result0;
         
@@ -1611,73 +1837,117 @@ var SCHEEM = (function(){
                     }
                   }
                   if (result0 === null) {
-                    if (input.substr(pos.offset, 4) === "list") {
-                      result0 = "list";
-                      advance(pos, 4);
+                    if (input.charCodeAt(pos.offset) === 62) {
+                      result0 = ">";
+                      advance(pos, 1);
                     } else {
                       result0 = null;
                       if (reportFailures === 0) {
-                        matchFailed("\"list\"");
+                        matchFailed("\">\"");
                       }
                     }
                     if (result0 === null) {
-                      if (input.substr(pos.offset, 4) === "cons") {
-                        result0 = "cons";
-                        advance(pos, 4);
+                      if (input.substr(pos.offset, 2) === "<=") {
+                        result0 = "<=";
+                        advance(pos, 2);
                       } else {
                         result0 = null;
                         if (reportFailures === 0) {
-                          matchFailed("\"cons\"");
+                          matchFailed("\"<=\"");
                         }
                       }
                       if (result0 === null) {
-                        if (input.substr(pos.offset, 3) === "car") {
-                          result0 = "car";
-                          advance(pos, 3);
+                        if (input.substr(pos.offset, 2) === ">=") {
+                          result0 = ">=";
+                          advance(pos, 2);
                         } else {
                           result0 = null;
                           if (reportFailures === 0) {
-                            matchFailed("\"car\"");
+                            matchFailed("\">=\"");
                           }
                         }
                         if (result0 === null) {
-                          if (input.substr(pos.offset, 3) === "cdr") {
-                            result0 = "cdr";
-                            advance(pos, 3);
+                          if (input.substr(pos.offset, 2) === "!=") {
+                            result0 = "!=";
+                            advance(pos, 2);
                           } else {
                             result0 = null;
                             if (reportFailures === 0) {
-                              matchFailed("\"cdr\"");
+                              matchFailed("\"!=\"");
                             }
                           }
                           if (result0 === null) {
-                            if (input.substr(pos.offset, 6) === "length") {
-                              result0 = "length";
-                              advance(pos, 6);
+                            if (input.substr(pos.offset, 4) === "list") {
+                              result0 = "list";
+                              advance(pos, 4);
                             } else {
                               result0 = null;
                               if (reportFailures === 0) {
-                                matchFailed("\"length\"");
+                                matchFailed("\"list\"");
                               }
                             }
                             if (result0 === null) {
-                              if (input.substr(pos.offset, 6) === "append") {
-                                result0 = "append";
-                                advance(pos, 6);
+                              if (input.substr(pos.offset, 4) === "cons") {
+                                result0 = "cons";
+                                advance(pos, 4);
                               } else {
                                 result0 = null;
                                 if (reportFailures === 0) {
-                                  matchFailed("\"append\"");
+                                  matchFailed("\"cons\"");
                                 }
                               }
                               if (result0 === null) {
-                                if (input.substr(pos.offset, 5) === "alert") {
-                                  result0 = "alert";
-                                  advance(pos, 5);
+                                if (input.substr(pos.offset, 3) === "car") {
+                                  result0 = "car";
+                                  advance(pos, 3);
                                 } else {
                                   result0 = null;
                                   if (reportFailures === 0) {
-                                    matchFailed("\"alert\"");
+                                    matchFailed("\"car\"");
+                                  }
+                                }
+                                if (result0 === null) {
+                                  if (input.substr(pos.offset, 3) === "cdr") {
+                                    result0 = "cdr";
+                                    advance(pos, 3);
+                                  } else {
+                                    result0 = null;
+                                    if (reportFailures === 0) {
+                                      matchFailed("\"cdr\"");
+                                    }
+                                  }
+                                  if (result0 === null) {
+                                    if (input.substr(pos.offset, 6) === "length") {
+                                      result0 = "length";
+                                      advance(pos, 6);
+                                    } else {
+                                      result0 = null;
+                                      if (reportFailures === 0) {
+                                        matchFailed("\"length\"");
+                                      }
+                                    }
+                                    if (result0 === null) {
+                                      if (input.substr(pos.offset, 6) === "append") {
+                                        result0 = "append";
+                                        advance(pos, 6);
+                                      } else {
+                                        result0 = null;
+                                        if (reportFailures === 0) {
+                                          matchFailed("\"append\"");
+                                        }
+                                      }
+                                      if (result0 === null) {
+                                        if (input.substr(pos.offset, 5) === "alert") {
+                                          result0 = "alert";
+                                          advance(pos, 5);
+                                        } else {
+                                          result0 = null;
+                                          if (reportFailures === 0) {
+                                            matchFailed("\"alert\"");
+                                          }
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               }
