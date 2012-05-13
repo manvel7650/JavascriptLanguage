@@ -106,13 +106,18 @@
 	</xsl:template>
 	
 	<xsl:template match="editor">
-		<textarea>
+		<textarea class="editor">
 			<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
-			<xsl:value-of select="." />
+			<xsl:copy-of select="./value" />
 		</textarea>
-		<div class="cursor">
-			<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
-			1:1
+		<div class="editorBottom">
+			<div class="editorButtons">
+				<xsl:copy-of select="./buttons" />
+			</div>
+			<div class="editorCursor">
+				<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
+				1:1
+			</div>
 		</div>
 	</xsl:template>
 	

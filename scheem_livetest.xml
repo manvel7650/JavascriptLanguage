@@ -6,7 +6,9 @@
 	<js src="./scheem/scheem.js" />
 	<js src="./js/livetest.js" />
 	<block title="Scheem Live Demo">
-		<editor id="scheem_code" mode="scheme" />
+		<editor id="scheem_code" mode="scheme">
+			<buttons><button onclick="updateResults(); return false;">Run</button></buttons>
+		</editor>
 		<html>
 			<table id="results">
 				<tr>

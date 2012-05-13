@@ -64,12 +64,25 @@ div.menuImage img {
 	width: 130px;
 }
 
-.cursor {
-	text-align: right;
+textarea.editor {
+
+}
+
+div.editorBottom {
 	background: none repeat scroll 0 0 #F7F7F7;
 	border-left: 1px solid #333333;
 	border-right: 1px solid #333333;
 	border-bottom: 1px solid #333333;
 	color: #000000;
-	padding: 2px 5px;
+}
+
+div.editorButtons {
+	display: inline-block;
+	width: 50%;
+}
+
+div.editorCursor {
+	text-align: right;
+	display: inline-block;
+	width: 50%;
 }

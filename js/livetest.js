@@ -1,38 +1,30 @@
-var scheemCodeValue = null;
+var scheemCodeValue = '';
 
 function onChange_scheem_code(editor) {
 	scheemCodeValue = editor.getValue();
 }
 
 function updateResults() {
-	if(scheemCodeValue != null) {
-		var tempValue = scheemCodeValue;
-		$('#results').fadeOut(function() {
+	$('#results').fadeOut(function() {
+		try {
 			try {
+				var parsed = scheem.parse(scheemCodeValue);
+				$('#parsed').html('<p class="success">' + JSON.stringify(parsed) + '</p>');
 				try {
-					var parsed = scheem.parse(tempValue);
-					$('#parsed').html('<p class="success">' + JSON.stringify(parsed) + '</p>');
-					try {
-						var result = scheem.evalScheem(parsed, {});
-						$('#result').html('<p class="success">' + JSON.stringify(result) + '</p>');
-					}
-					catch(e) {
-						$('#result').html('<p class="error">' + e + '</p>');
-					}
+					var result = scheem.evalScheem(parsed, {});
+					$('#result').html('<p class="success">' + JSON.stringify(result) + '</p>');
 				}
 				catch(e) {
-					$('#parsed').html('<p class="error">' + e + '</p>');
-					$('#result').html('');
+					$('#result').html('<p class="error">' + e + '</p>');
 				}
 			}
-			finally {
-				$('#results').fadeIn();
+			catch(e) {
+				$('#parsed').html('<p class="error">' + e + '</p>');
+				$('#result').html('');
 			}
-		});
-		
-	}
-	scheemCodeValue = null;
-	window.setTimeout(updateResults, 2000);
+		}
+		finally {
+			$('#results').fadeIn();
+		}
+	});
 }
-
-window.setTimeout(updateResults, 2000);
