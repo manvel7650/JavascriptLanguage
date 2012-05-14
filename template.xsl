@@ -23,10 +23,9 @@
 							<xsl:apply-templates select="load" />
 							<xsl:for-each select="//editor">
 								setupEditor(
-									$('#<xsl:value-of select="@id" />'), 
-									$('#cursor_<xsl:value-of select="@id" />'), 
+									'<xsl:value-of select="@id" />', 
 									'<xsl:value-of select="@mode" />',
-									onChange_<xsl:value-of select="@id" />
+									'<xsl:value-of select="value" />'
 								);
 							</xsl:for-each>
 						});
@@ -53,6 +52,7 @@
 								<td>
 									<div class="menuImage"><img src="./images/scheme.png" alt="Scheem" /></div>
 									<a href="./scheem_livetest.xml" target="_self">Live!</a>
+									<a href="./scheem_example.xml" target="_self">Examples</a>
 									<a href="./scheem_webtest.xml" target="_self">Tests</a>
 								</td>
 							</tr>
@@ -89,16 +89,21 @@
 	</xsl:template>
 	
 	<xsl:template match="block">
-		<h2><xsl:value-of select="@title"/></h2>  
+		<h1><xsl:value-of select="@title"/></h1>  
 		<xsl:apply-templates  />
-	</xsl:template>
-	
-	<xsl:template match="p">
-		<p><xsl:value-of select="."/></p>
 	</xsl:template>
 	
 	<xsl:template match="html">
 		<xsl:copy-of select="./*" />
+	</xsl:template>
+	
+	<xsl:template match="collapsible">
+		<xsl:variable name="id" select="@id"/>
+		<h2 class="collapsible" onclick="toogleCollapse('{$id}');"><xsl:value-of select="@title" /></h2>
+		<div class="collapsible">
+			<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
+			<xsl:apply-templates  select="./*"/>
+		</div>
 	</xsl:template>
 	
 	<xsl:template match="load">
@@ -108,7 +113,6 @@
 	<xsl:template match="editor">
 		<textarea class="editor">
 			<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
-			<xsl:copy-of select="./value" />
 		</textarea>
 		<div class="editorBottom">
 			<div class="editorButtons">
@@ -118,6 +122,13 @@
 				<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
 				1:1
 			</div>
+		</div>
+		<div class="result">
+			<xsl:attribute name="id">result_div_<xsl:value-of select="@id" /></xsl:attribute>
+			<span class="resultHeader">Result</span>
+			<span>
+				<xsl:attribute name="id">result_<xsl:value-of select="@id" /></xsl:attribute>
+			</span>
 		</div>
 	</xsl:template>
 	
