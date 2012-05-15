@@ -30,7 +30,7 @@
 		</collapsible>
 		<collapsible title="Apply function to list" id="function">
 			<editor id="function_code" mode="scheme">
-				<value><![CDATA[(begin\n\t(define c 0)\n\t(define sum\n\t\t(lambda (n) (set! c (+ c n)))\n\t)\n\t(define exec\n\t\t(lambda (l f) (begin (f (car l)) (if (> (length l) 1) (exec (cdr l) f) l)))\n\t)\n\t(exec (list 1 2 3) sum)\n\tc\n)]]></value>
+				<value><![CDATA[(begin\n\t(define c 0)\n\t(define sum\n\t\t(lambda (n) (set! c (+ c n)))\n\t)\n\t(define exec\n\t\t(lambda (l f) (begin (f (car l)) (if (> (length l) 1) (exec (cdr l) f) c)))\n\t)\n\t(exec (list 1 2 3) sum)\n)]]></value>
 				<buttons><button onclick="executeScheem('function_code'); return false;">Run</button></buttons>
 			</editor>
 		</collapsible>
