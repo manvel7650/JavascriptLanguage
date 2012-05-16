@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<script type="text/javascript" src="raphael-min.js"></script>
+		<script type="text/javascript" src="turtle.js"></script>
+		<script type="text/javascript">
+			function init() {
+				new Raphael('raphael', 400, 400, function() {
+					var turtle = new Turtle(400, 400, 'turtle.svg', this, 500);
+					this.rect(0, 0, 400, 400);
+					turtle.draw(50, function() {
+							turtle.move(50, function() {
+								turtle.left(90, function() {
+									turtle.draw(50, function() {
+										turtle.right(45, function() {
+											turtle.draw(100, function() {
+											});
+										});
+									});
+								});
+							})
+						}
+					);
+				});
+			}
+		</script>
+	</head>
+	<body onload="init();">
+		<div id="raphael"></div>
+	</body>
+</html>
