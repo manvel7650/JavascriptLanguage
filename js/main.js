@@ -77,6 +77,7 @@ function executeTurtle(editorId, canvasId) {
 			var parsed = TURTLE.parse(editors[editorId].getValue());
             var result = turtle.evalStatements(parsed, env);
 			$('#result_' + editorId).html('<p class="success">' + JSON.stringify(result) + '</p>');
+			turtles[canvasId].run(1);
 		}
 		catch(e) {
 			$('#result_' + editorId).html('<p class="error">' + e + '</p>');
