@@ -1,19 +1,19 @@
 if (typeof module !== 'undefined') {
 	var assert = require('chai').assert;
+	var TURTLE = require('../parser.js');
+	var parse = TURTLE.parse;
 	var turtle = require('../turtle.js');
 	var lookup = turtle.lookup;
 	var evalExpr = turtle.evalExpr;
 	var evalStatement = turtle.evalStatement;
 	var evalStatements = turtle.evalStatements;
-	var TURTLE = require('../parser.js');
-	var parse = TURTLE.parse;
 } else {
+	var parse = TURTLE.parse;
+	var assert = chai.assert;
 	var lookup = turtle.lookup;
 	var evalExpr = turtle.evalExpr;
 	var evalStatement = turtle.evalStatement;
 	var evalStatements = turtle.evalStatements;
-	var parse = TURTLE.parse;
-	var assert = chai.assert;
 }
 
 suite('parse', function() {
