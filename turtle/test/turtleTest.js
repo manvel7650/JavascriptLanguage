@@ -168,6 +168,48 @@ suite('parse', function() {
 			];
 		assert.deepEqual(parse(txt, 'statements'), res);
 	});
+	test('repeat', function() {
+		var txt = "var x; x:=1; while(x<4) { x:=x+1; }";
+		var res =
+			[
+			   {
+				  "tag": "var",
+				  "name": "x"
+			   },
+			   {
+				  "tag": ":=",
+				  "left": "x",
+				  "right": 1
+			   },
+			   {
+				  "tag": "while",
+				  "expr": {
+						"tag": "<",
+						"left": {
+									"tag": "ident",
+									"name": "x"
+								 },
+						"right": 4
+				  },
+				  "body": [
+					{
+						"tag": ":=",
+						"left": "x",
+						"right": {
+							"tag": "+",
+							"left": {
+									"tag": "ident",
+									"name": "x"
+								 },
+							"right": 1
+						}
+					}
+					
+				  ]
+			   }
+			];
+		assert.deepEqual(parse(txt, 'statements'), res);
+	});
 	test('spiral example', function() {
 		var txt = (
 			'define spiral(size) {' +
@@ -371,5 +413,10 @@ suite('evalStatements', function () {
 	test('simple define sequenced', function () {
 		var stmt = parse('define g() {} 100;', 'statements');
 		assert.deepEqual(evalStatements(stmt, env), 100);
+	});
+	test('while', function () {
+		var stmt = parse('x:=1; while(x<4) { x:=x+1; }', 'statements');
+		evalStatements(stmt, env);
+		assert.deepEqual(env.bindings.x, 4);
 	});
 });
