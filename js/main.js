@@ -26,8 +26,7 @@ var editors = {};
 function setupEditor(editorId, mode, editorValue) {
 	var codeMirrorEditor = CodeMirror.fromTextArea($('#' + editorId)[0], {
 		mode: mode,
-		theme: 'nojw',
-		
+		theme: 'nojw',		
 		indentUnit: 4,
 		lineNumbers: true,
 		matchBrackets: true,
@@ -41,10 +40,18 @@ function setupEditor(editorId, mode, editorValue) {
 	editors[editorId] = codeMirrorEditor;
 }
 
+function setupCanvas(canvasId) {
+	new Raphael(canvasId, null, 600, function() { initTurtle(this, canvasId); });
+}
+
+var turtles = {};
+
+function initTurtle(raphael, canvasId) {
+	turtles[canvasId] = new Tortoise('./images/tortoise.svg', raphael, 500);
+}
+
 function executeScheem(editorId) {
 	$('#result_div_' + editorId).fadeOut(function() {
-		var cursor = $('body').css('cursor');
-		$('body').css('cursor', 'wait');
 		try {
 			var parsed = scheem.parse(editors[editorId].getValue());
 			var result = scheem.evalScheem(parsed, {});
@@ -54,10 +61,31 @@ function executeScheem(editorId) {
 			$('#result_' + editorId).html('<p class="error">' + e + '</p>');
 		}
 		finally {
-			$('body').css('cursor', cursor);
 			$('#result_div_' + editorId).fadeIn();
 		}
 	});
+}
+
+function executeTurtle(editorId, canvasId) {
+	$('#result_div_' + editorId).fadeOut(function() {
+		try {
+			var env = { };
+			turtles[canvasId].clear();
+			turtle.add_binding(env, 'forward', function(d) { turtles[canvasId].draw(d); });
+			turtle.add_binding(env, 'right', function(a) { turtles[canvasId].right(a); });
+			turtle.add_binding(env, 'left', function(a) { turtles[canvasId].left(a); });
+			var parsed = TURTLE.parse(editors[editorId].getValue());
+            var result = turtle.evalStatements(parsed, env);
+			$('#result_' + editorId).html('<p class="success">' + JSON.stringify(result) + '</p>');
+		}
+		catch(e) {
+			$('#result_' + editorId).html('<p class="error">' + e + '</p>');
+		}
+		finally {
+			$('#result_div_' + editorId).fadeIn();
+		}
+	});
+	
 }
 
 function toogleCollapse(element) {

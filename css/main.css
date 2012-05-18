@@ -139,3 +139,14 @@ div.collapsible {
 	border-bottom-right-radius: 8px;
 	box-shadow: 7px 7px 3px #888888;
 }
+
+div.turtleEditor {
+	display: inline-block;
+	width: 50%;
+	float: right;
+}
+
+div.turtleCanvas{
+	display: inline-block;
+	width: 50%;
+}

@@ -15,6 +15,7 @@
 				<script type="text/javascript" src="./js/mbMenu.js"></script>
 				<script type="text/javascript" src="./js/codemirror.js"></script>
 				<script type="text/javascript" src="./js/scheme.js"></script>
+				<script type="text/javascript" src="./js/raphael.js"></script>
 				<script type="text/javascript" src="./js/main.js"></script>
 				<xsl:apply-templates select="js" />
 				<script type="text/javascript">
@@ -26,6 +27,11 @@
 									'<xsl:value-of select="@id" />', 
 									'<xsl:value-of select="@mode" />',
 									'<xsl:value-of select="value" />'
+								);
+							</xsl:for-each>
+							<xsl:for-each select="//canvas">
+								setupCanvas(
+									'<xsl:value-of select="@id" />'
 								);
 							</xsl:for-each>
 						});
@@ -43,6 +49,10 @@
 									<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_scheem'}</xsl:text></xsl:attribute>
 									Scheem
 								</td>
+								<td>
+									<xsl:attribute name="class"><xsl:text disable-output-escaping="yes">rootVoice {menu: 'menu_turtle'}</xsl:text></xsl:attribute>
+									Turtle
+								</td>
 							</tr>
 						</table>
 					</div>				
@@ -54,6 +64,16 @@
 									<a href="./scheem_livetest.xml" target="_self">Live!</a>
 									<a href="./scheem_example.xml" target="_self">Examples</a>
 									<a href="./scheem_webtest.xml" target="_self">Tests</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="menu_turtle" class="mbmenu boxMenu">
+						<table>
+							<tr>
+								<td>
+									<div class="menuImage"><img src="./images/tortoise.svg" alt="Turtle" /></div>
+									<a href="./turtle_livetest.xml" target="_self">Live!</a>
 								</td>
 							</tr>
 						</table>
@@ -111,24 +131,34 @@
 	</xsl:template>
 	
 	<xsl:template match="editor">
-		<textarea class="editor">
-			<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
-		</textarea>
-		<div class="editorBottom">
-			<div class="editorButtons">
-				<xsl:copy-of select="./buttons" />
+		<div>
+			<xsl:attribute name="class"><xsl:value-of select="@class" /></xsl:attribute>
+			<textarea class="editor">
+				<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
+			</textarea>
+			<div class="editorBottom">
+				<div class="editorButtons">
+					<xsl:copy-of select="./buttons" />
+				</div>
+				<div class="editorCursor">
+					<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
+					1:1
+				</div>
 			</div>
-			<div class="editorCursor">
-				<xsl:attribute name="id">cursor_<xsl:value-of select="@id" /></xsl:attribute>
-				1:1
+			<div class="result">
+				<xsl:attribute name="id">result_div_<xsl:value-of select="@id" /></xsl:attribute>
+				<span class="resultHeader">Result</span>
+				<span>
+					<xsl:attribute name="id">result_<xsl:value-of select="@id" /></xsl:attribute>
+				</span>
 			</div>
 		</div>
-		<div class="result">
-			<xsl:attribute name="id">result_div_<xsl:value-of select="@id" /></xsl:attribute>
-			<span class="resultHeader">Result</span>
-			<span>
-				<xsl:attribute name="id">result_<xsl:value-of select="@id" /></xsl:attribute>
-			</span>
+	</xsl:template>
+	
+	<xsl:template match="canvas">
+		<div class="canvas">
+			<xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
+			<xsl:attribute name="class"><xsl:value-of select="@class" /></xsl:attribute>
 		</div>
 	</xsl:template>
 	
