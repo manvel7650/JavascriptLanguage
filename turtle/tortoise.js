@@ -6,7 +6,9 @@ function Tortoise(imageSrc, paper) {
 }
 
 Tortoise.prototype.clear = function() {
-	this.params = {};
+	this.params = {
+		stroke: 'black'
+	};
 	this.x = this.paper.width / 2;
 	this.y = this.paper.height / 2;
 	this.angle = 90;
@@ -32,7 +34,7 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 			var starty = this.y;
 			this.x = this.x + Math.cos(Raphael.rad(this.angle)) * operation.distance;
 			this.y = this.y - Math.sin(Raphael.rad(this.angle)) * operation.distance;
-			this.paper.path(Raphael.format('M{0},{1}L{2},{3}', startx, starty, this.x, this.y)).attr(this.params);
+			this.paper.path(Raphael.format('M{0},{1}L{2},{3}', startx, starty, this.x, this.y)).attr(operation.attr);
 			break;
 		case 'move':
 			this.x = this.x + Math.cos(Raphael.rad(this.angle)) * operation.distance;
@@ -49,19 +51,19 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 }
 
 Tortoise.prototype.move = function(distance) {
-	this.operations.push({operation: 'move', distance: distance});
+	this.operations.push({operation: 'move', distance: distance, attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.draw = function(distance) {
-	this.operations.push({operation: 'draw', distance: distance});
+	this.operations.push({operation: 'draw', distance: distance, attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.left = function(angle) {
-	this.operations.push({operation: 'left', angle: angle});
+	this.operations.push({operation: 'left', angle: angle, attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.right = function(angle) {
-	this.operations.push({operation: 'right', angle: angle});
+	this.operations.push({operation: 'right', angle: angle, attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.updateTortoise = function(animation, callback) {
