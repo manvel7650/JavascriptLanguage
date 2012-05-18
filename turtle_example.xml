@@ -8,7 +8,7 @@
 		<collapsible title="Rose" id="rose">
 			<canvas id="rose_canvas" class="turtleCanvas"/>		
 			<editor id="rose_code" mode="c" class="turtleEditor">
-				<value><![CDATA[color(BLUE);\nrepeat(18) {\n\tright(20);\n\trepeat(36) {\n\t\tdraw(20);\n\t\tright(10);\n\t}\n}]]></value>
+				<value><![CDATA[color(BLUE);\nrepeat(18) {\n\tright(20);\n\trepeat(36) {\n\t\tdraw(10);\n\t\tright(10);\n\t}\n}]]></value>
 				<buttons><button onclick="executeTurtle('rose_code','rose_canvas'); return false;">Run</button></buttons>
 			</editor>					
 		</collapsible>
