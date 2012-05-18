@@ -142,11 +142,11 @@ div.collapsible {
 
 div.turtleEditor {
 	display: inline-block;
-	width: 50%;
-	float: right;
+	width: 50%;	
 }
 
-div.turtleCanvas{
+div.turtleCanvas{	
+	float: right;
 	display: inline-block;
 	width: 50%;
 }
