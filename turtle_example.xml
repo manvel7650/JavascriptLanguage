@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="template.xsl"?>
+<page title="PL101 Javascript Language">
+	<js src="./turtle/parser.js" />
+	<js src="./turtle/turtle.js" />
+	<js src="./turtle/tortoise.js" />
+	<block title="Turtle Examples">
+		<collapsible title="Rose" id="rose">
+			<canvas id="rose_canvas" class="turtleCanvas"/>		
+			<editor id="rose_code" mode="c" class="turtleEditor">
+				<value><![CDATA[color(BLUE);\nrepeat(18) {\n\tright(20);\n\trepeat(36) {\n\t\tdraw(20);\n\t\tright(10);\n\t}\n}]]></value>
+				<buttons><button onclick="executeTurtle('rose_code','rose_canvas'); return false;">Run</button></buttons>
+			</editor>					
+		</collapsible>
+		<collapsible title="Flower" id="flower">
+			<canvas id="flower_canvas" class="turtleCanvas"/>		
+			<editor id="flower_code" mode="c" class="turtleEditor">
+				<value><![CDATA[right(180);\nmove(50);\nright(180);\ncolor(ORANGE);\nright(90);\ndraw(150);\nright(180);\ndraw(300);\nright(180);\nmove(150);\nleft(90);\nleft(10);\ncolor(GREEN);\nrepeat(3) {\n\tdraw(100);\n\tright(180);\n\tmove(100);\n\tright(180);\n\tright(10);\n}\nleft(20);\ndraw(120);\ncolor(RED);\nleft(90);\nrepeat(10) {\n\tdraw(20);\n\trepeat(10) {\n\t\tright(20);\n\t\tdraw(2);\n\t}\n\tdraw(20);\n}]]></value>
+				<buttons><button onclick="executeTurtle('flower_code','flower_canvas'); return false;">Run</button></buttons>
+			</editor>					
+		</collapsible>
+	</block>
+</page>
