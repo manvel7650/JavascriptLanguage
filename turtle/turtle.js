@@ -117,6 +117,19 @@ var evalStatement = function (stmt, env) {
 				val = evalStatements(stmt.body, env);
 			}
 			return val;
+		// While
+		case 'while':
+			// do a loop
+			while(true) {
+				num = evalExpr(stmt.expr, env);
+				// check expr
+				if(num === null) break;
+				if(typeof num === 'number' && num === 0) break;
+				if(!num) break;
+				
+				val = evalStatements(stmt.body, env);
+			}
+			return val;
 		// If
 		case 'if':
 			cond_expr = evalExpr(stmt.expr, env);

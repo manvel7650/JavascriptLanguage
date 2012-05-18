@@ -932,101 +932,95 @@ var TURTLE = (function(){
               if (result0 === null) {
                 pos0 = pos;
                 pos1 = pos;
-                if (input.substr(pos, 4) === "var ") {
-                  result0 = "var ";
-                  pos += 4;
+                if (input.substr(pos, 5) === "while") {
+                  result0 = "while";
+                  pos += 5;
                 } else {
                   result0 = null;
                   if (reportFailures === 0) {
-                    matchFailed("\"var \"");
+                    matchFailed("\"while\"");
                   }
                 }
                 if (result0 !== null) {
                   result1 = parse_ws();
                   if (result1 !== null) {
-                    result2 = parse_identifier();
+                    if (input.charCodeAt(pos) === 40) {
+                      result2 = "(";
+                      pos++;
+                    } else {
+                      result2 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("\"(\"");
+                      }
+                    }
                     if (result2 !== null) {
                       result3 = parse_ws();
                       if (result3 !== null) {
-                        if (input.charCodeAt(pos) === 59) {
-                          result4 = ";";
-                          pos++;
-                        } else {
-                          result4 = null;
-                          if (reportFailures === 0) {
-                            matchFailed("\";\"");
-                          }
-                        }
+                        result4 = parse_expression();
                         if (result4 !== null) {
                           result5 = parse_ws();
                           if (result5 !== null) {
-                            result0 = [result0, result1, result2, result3, result4, result5];
-                          } else {
-                            result0 = null;
-                            pos = pos1;
-                          }
-                        } else {
-                          result0 = null;
-                          pos = pos1;
-                        }
-                      } else {
-                        result0 = null;
-                        pos = pos1;
-                      }
-                    } else {
-                      result0 = null;
-                      pos = pos1;
-                    }
-                  } else {
-                    result0 = null;
-                    pos = pos1;
-                  }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-                if (result0 !== null) {
-                  result0 = (function(offset, v) { return { tag:"var", name:v }; })(pos0, result0[2]);
-                }
-                if (result0 === null) {
-                  pos = pos0;
-                }
-                if (result0 === null) {
-                  pos0 = pos;
-                  pos1 = pos;
-                  result0 = parse_identifier();
-                  if (result0 !== null) {
-                    result1 = parse_ws();
-                    if (result1 !== null) {
-                      if (input.substr(pos, 2) === ":=") {
-                        result2 = ":=";
-                        pos += 2;
-                      } else {
-                        result2 = null;
-                        if (reportFailures === 0) {
-                          matchFailed("\":=\"");
-                        }
-                      }
-                      if (result2 !== null) {
-                        result3 = parse_ws();
-                        if (result3 !== null) {
-                          result4 = parse_expression();
-                          if (result4 !== null) {
-                            result5 = parse_ws();
-                            if (result5 !== null) {
-                              if (input.charCodeAt(pos) === 59) {
-                                result6 = ";";
-                                pos++;
-                              } else {
-                                result6 = null;
-                                if (reportFailures === 0) {
-                                  matchFailed("\";\"");
-                                }
+                            if (input.charCodeAt(pos) === 41) {
+                              result6 = ")";
+                              pos++;
+                            } else {
+                              result6 = null;
+                              if (reportFailures === 0) {
+                                matchFailed("\")\"");
                               }
-                              if (result6 !== null) {
-                                result7 = parse_ws();
-                                if (result7 !== null) {
-                                  result0 = [result0, result1, result2, result3, result4, result5, result6, result7];
+                            }
+                            if (result6 !== null) {
+                              result7 = parse_ws();
+                              if (result7 !== null) {
+                                if (input.charCodeAt(pos) === 123) {
+                                  result8 = "{";
+                                  pos++;
+                                } else {
+                                  result8 = null;
+                                  if (reportFailures === 0) {
+                                    matchFailed("\"{\"");
+                                  }
+                                }
+                                if (result8 !== null) {
+                                  result9 = parse_ws();
+                                  if (result9 !== null) {
+                                    result10 = parse_statements();
+                                    if (result10 !== null) {
+                                      result11 = parse_ws();
+                                      if (result11 !== null) {
+                                        if (input.charCodeAt(pos) === 125) {
+                                          result12 = "}";
+                                          pos++;
+                                        } else {
+                                          result12 = null;
+                                          if (reportFailures === 0) {
+                                            matchFailed("\"}\"");
+                                          }
+                                        }
+                                        if (result12 !== null) {
+                                          result13 = parse_ws();
+                                          if (result13 !== null) {
+                                            result0 = [result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13];
+                                          } else {
+                                            result0 = null;
+                                            pos = pos1;
+                                          }
+                                        } else {
+                                          result0 = null;
+                                          pos = pos1;
+                                        }
+                                      } else {
+                                        result0 = null;
+                                        pos = pos1;
+                                      }
+                                    } else {
+                                      result0 = null;
+                                      pos = pos1;
+                                    }
+                                  } else {
+                                    result0 = null;
+                                    pos = pos1;
+                                  }
                                 } else {
                                   result0 = null;
                                   pos = pos1;
@@ -1059,8 +1053,74 @@ var TURTLE = (function(){
                     result0 = null;
                     pos = pos1;
                   }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+                if (result0 !== null) {
+                  result0 = (function(offset, expr, body) { return { tag:"while", expr:expr, body:body }; })(pos0, result0[4], result0[10]);
+                }
+                if (result0 === null) {
+                  pos = pos0;
+                }
+                if (result0 === null) {
+                  pos0 = pos;
+                  pos1 = pos;
+                  if (input.substr(pos, 4) === "var ") {
+                    result0 = "var ";
+                    pos += 4;
+                  } else {
+                    result0 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("\"var \"");
+                    }
+                  }
                   if (result0 !== null) {
-                    result0 = (function(offset, v, expr) { return { tag:":=", left:v, right:expr }; })(pos0, result0[0], result0[4]);
+                    result1 = parse_ws();
+                    if (result1 !== null) {
+                      result2 = parse_identifier();
+                      if (result2 !== null) {
+                        result3 = parse_ws();
+                        if (result3 !== null) {
+                          if (input.charCodeAt(pos) === 59) {
+                            result4 = ";";
+                            pos++;
+                          } else {
+                            result4 = null;
+                            if (reportFailures === 0) {
+                              matchFailed("\";\"");
+                            }
+                          }
+                          if (result4 !== null) {
+                            result5 = parse_ws();
+                            if (result5 !== null) {
+                              result0 = [result0, result1, result2, result3, result4, result5];
+                            } else {
+                              result0 = null;
+                              pos = pos1;
+                            }
+                          } else {
+                            result0 = null;
+                            pos = pos1;
+                          }
+                        } else {
+                          result0 = null;
+                          pos = pos1;
+                        }
+                      } else {
+                        result0 = null;
+                        pos = pos1;
+                      }
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                  if (result0 !== null) {
+                    result0 = (function(offset, v) { return { tag:"var", name:v }; })(pos0, result0[2]);
                   }
                   if (result0 === null) {
                     pos = pos0;
@@ -1068,23 +1128,55 @@ var TURTLE = (function(){
                   if (result0 === null) {
                     pos0 = pos;
                     pos1 = pos;
-                    result0 = parse_expression();
+                    result0 = parse_identifier();
                     if (result0 !== null) {
                       result1 = parse_ws();
                       if (result1 !== null) {
-                        if (input.charCodeAt(pos) === 59) {
-                          result2 = ";";
-                          pos++;
+                        if (input.substr(pos, 2) === ":=") {
+                          result2 = ":=";
+                          pos += 2;
                         } else {
                           result2 = null;
                           if (reportFailures === 0) {
-                            matchFailed("\";\"");
+                            matchFailed("\":=\"");
                           }
                         }
                         if (result2 !== null) {
                           result3 = parse_ws();
                           if (result3 !== null) {
-                            result0 = [result0, result1, result2, result3];
+                            result4 = parse_expression();
+                            if (result4 !== null) {
+                              result5 = parse_ws();
+                              if (result5 !== null) {
+                                if (input.charCodeAt(pos) === 59) {
+                                  result6 = ";";
+                                  pos++;
+                                } else {
+                                  result6 = null;
+                                  if (reportFailures === 0) {
+                                    matchFailed("\";\"");
+                                  }
+                                }
+                                if (result6 !== null) {
+                                  result7 = parse_ws();
+                                  if (result7 !== null) {
+                                    result0 = [result0, result1, result2, result3, result4, result5, result6, result7];
+                                  } else {
+                                    result0 = null;
+                                    pos = pos1;
+                                  }
+                                } else {
+                                  result0 = null;
+                                  pos = pos1;
+                                }
+                              } else {
+                                result0 = null;
+                                pos = pos1;
+                              }
+                            } else {
+                              result0 = null;
+                              pos = pos1;
+                            }
                           } else {
                             result0 = null;
                             pos = pos1;
@@ -1102,10 +1194,53 @@ var TURTLE = (function(){
                       pos = pos1;
                     }
                     if (result0 !== null) {
-                      result0 = (function(offset, expr) { return { tag:"ignore", body:expr }; })(pos0, result0[0]);
+                      result0 = (function(offset, v, expr) { return { tag:":=", left:v, right:expr }; })(pos0, result0[0], result0[4]);
                     }
                     if (result0 === null) {
                       pos = pos0;
+                    }
+                    if (result0 === null) {
+                      pos0 = pos;
+                      pos1 = pos;
+                      result0 = parse_expression();
+                      if (result0 !== null) {
+                        result1 = parse_ws();
+                        if (result1 !== null) {
+                          if (input.charCodeAt(pos) === 59) {
+                            result2 = ";";
+                            pos++;
+                          } else {
+                            result2 = null;
+                            if (reportFailures === 0) {
+                              matchFailed("\";\"");
+                            }
+                          }
+                          if (result2 !== null) {
+                            result3 = parse_ws();
+                            if (result3 !== null) {
+                              result0 = [result0, result1, result2, result3];
+                            } else {
+                              result0 = null;
+                              pos = pos1;
+                            }
+                          } else {
+                            result0 = null;
+                            pos = pos1;
+                          }
+                        } else {
+                          result0 = null;
+                          pos = pos1;
+                        }
+                      } else {
+                        result0 = null;
+                        pos = pos1;
+                      }
+                      if (result0 !== null) {
+                        result0 = (function(offset, expr) { return { tag:"ignore", body:expr }; })(pos0, result0[0]);
+                      }
+                      if (result0 === null) {
+                        pos = pos0;
+                      }
                     }
                   }
                 }
