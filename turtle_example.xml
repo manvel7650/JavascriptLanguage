@@ -8,21 +8,28 @@
 		<collapsible title="Rose" id="rose">
 			<canvas id="rose_canvas" class="turtleCanvas"/>		
 			<editor id="rose_code" mode="c" class="turtleEditor">
-				<value><![CDATA[color(BLUE);\nrepeat(18) {\n\tright(20);\n\trepeat(36) {\n\t\tdraw(10);\n\t\tright(10);\n\t}\n}]]></value>
+				<value><![CDATA[color(\'blue\');\nrepeat(18) {\n\tright(20);\n\trepeat(36) {\n\t\tdraw(10);\n\t\tright(10);\n\t}\n}]]></value>
 				<buttons><button onclick="executeTurtle('rose_code','rose_canvas'); return false;">Run</button></buttons>
 			</editor>					
 		</collapsible>
 		<collapsible title="Spiral" id="spiral">
 			<canvas id="spiral_canvas" class="turtleCanvas"/>		
 			<editor id="spiral_code" mode="c" class="turtleEditor">
-				<value><![CDATA[color(BLUE);\ndefine spiral(size) {\n\tif (size < 30) {\n\t\tdraw(size);\n\t\tright(15);\n\t\tvar newsize;\n\t\tnewsize := size * 1.02;\n\t\tspiral(newsize);\n\t}\n}\nspiral(5);]]></value>
+				<value><![CDATA[color(\'blue\');\ndefine spiral(size) {\n\tif (size < 30) {\n\t\tdraw(size);\n\t\tright(15);\n\t\tvar newsize;\n\t\tnewsize := size * 1.02;\n\t\tspiral(newsize);\n\t}\n}\nspiral(5);]]></value>
 				<buttons><button onclick="executeTurtle('spiral_code','spiral_canvas'); return false;">Run</button></buttons>
+			</editor>					
+		</collapsible>
+		<collapsible title="Toroid" id="toroid">
+			<canvas id="toroid_canvas" class="turtleCanvas"/>		
+			<editor id="toroid_code" mode="c" class="turtleEditor">
+				<value><![CDATA[color(\'blue\');\nrepeat(18) {\n\tright(20);\n\tmove(20);\n\tcircle(80);\n\tmove(-20);\n}]]></value>
+				<buttons><button onclick="executeTurtle('toroid_code','toroid_canvas'); return false;">Run</button></buttons>
 			</editor>					
 		</collapsible>
 		<collapsible title="Flower" id="flower">
 			<canvas id="flower_canvas" class="turtleCanvas"/>		
 			<editor id="flower_code" mode="c" class="turtleEditor">
-				<value><![CDATA[right(180);\nmove(50);\nright(180);\ncolor(ORANGE);\nright(90);\ndraw(150);\nright(180);\ndraw(300);\nright(180);\nmove(150);\nleft(90);\nleft(10);\ncolor(GREEN);\nrepeat(3) {\n\tdraw(100);\n\tright(180);\n\tmove(100);\n\tright(180);\n\tright(10);\n}\nleft(20);\ndraw(120);\ncolor(RED);\nleft(90);\nrepeat(10) {\n\tdraw(20);\n\trepeat(10) {\n\t\tright(20);\n\t\tdraw(2);\n\t}\n\tdraw(20);\n}]]></value>
+				<value><![CDATA[right(180);\nmove(50);\nright(180);\ncolor(\'orange\');\nright(90);\ndraw(150);\nright(180);\ndraw(300);\nright(180);\nmove(150);\nleft(90);\nleft(10);\ncolor(\'green\');\nrepeat(3) {\n\tdraw(100);\n\tright(180);\n\tmove(100);\n\tright(180);\n\tright(10);\n}\nleft(20);\ndraw(120);\ncolor(\'red\');\nleft(90);\nrepeat(10) {\n\tdraw(20);\n\trepeat(10) {\n\t\tright(20);\n\t\tdraw(2);\n\t}\n\tdraw(20);\n}\ncolor(\'yellow\');\nmove(-2);\nrepeat(18) {\n\tdraw(1);\n\tright(20);\n}\ncolor(\'black\');\nleft(45);\nmove(100);\ntext(\'http://sonic.net/~nbs/webturtle/webturtle.cgi?file=flower\');\nhome();]]></value>
 				<buttons><button onclick="executeTurtle('flower_code','flower_canvas'); return false;">Run</button></buttons>
 			</editor>					
 		</collapsible>

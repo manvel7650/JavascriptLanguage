@@ -75,9 +75,9 @@ function executeTurtle(editorId, canvasId) {
 			turtle.add_binding(env, 'move', function(d) { turtles[canvasId].move(d); });
 			turtle.add_binding(env, 'right', function(a) { turtles[canvasId].right(a); });
 			turtle.add_binding(env, 'left', function(a) { turtles[canvasId].left(a); });
-			turtle.add_binding(env, 'rect', function(a) { turtles[canvasId].left(a); });
-			turtle.add_binding(env, 'circle', function(a) { turtles[canvasId].left(a); });
-			turtle.add_binding(env, 'text', function(a) { turtles[canvasId].left(a); });
+			turtle.add_binding(env, 'rect', function(a) { turtles[canvasId].rect(a); });
+			turtle.add_binding(env, 'circle', function(a) { turtles[canvasId].circle(a); });
+			turtle.add_binding(env, 'text', function(a) { turtles[canvasId].text(a); });
 			turtle.add_binding(env, 'color', function(c) { turtles[canvasId].params.stroke = c; });			
 			var parsed = TURTLE.parse(editors[editorId].getValue());
             var result = turtle.evalStatements(parsed, env);
