@@ -41,13 +41,13 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 			this.y = this.y - Math.sin(Raphael.rad(this.angle)) * operation.distance;
 			break;
 		case 'rect':
-			this.paper.rect(this.x, this.y, operation.size, operation.size)).attr(operation.attr);
+			this.paper.rect(this.x, this.y, operation.size, operation.size).attr(operation.attr);
 			break;
 		case 'circle':
-			this.paper.circle(this.x, this.y, operation.radious)).attr(operation.attr);
+			this.paper.circle(this.x, this.y, operation.radious).attr(operation.attr);
 			break;
 		case 'text':
-			this.paper.text(this.x, this.y, operation.text)).attr(operation.attr);
+			this.paper.text(this.x, this.y, operation.text).attr(operation.attr);
 			break;
 		case 'left':
 			this.angle -= operation.angle;
