@@ -75,12 +75,10 @@ function executeTurtle(editorId, canvasId) {
 			turtle.add_binding(env, 'move', function(d) { turtles[canvasId].move(d); });
 			turtle.add_binding(env, 'right', function(a) { turtles[canvasId].right(a); });
 			turtle.add_binding(env, 'left', function(a) { turtles[canvasId].left(a); });
-			turtle.add_binding(env, 'color', function(c) { turtles[canvasId].params.stroke = c; });
-			turtle.add_binding(env, 'ORANGE', 'orange');
-			turtle.add_binding(env, 'RED', 'red');
-			turtle.add_binding(env, 'GREEN', 'green');
-			turtle.add_binding(env, 'BLUE', 'blue');
-			turtle.add_binding(env, 'YELLOW', 'yellow');
+			turtle.add_binding(env, 'rect', function(a) { turtles[canvasId].left(a); });
+			turtle.add_binding(env, 'circle', function(a) { turtles[canvasId].left(a); });
+			turtle.add_binding(env, 'text', function(a) { turtles[canvasId].left(a); });
+			turtle.add_binding(env, 'color', function(c) { turtles[canvasId].params.stroke = c; });			
 			var parsed = TURTLE.parse(editors[editorId].getValue());
             var result = turtle.evalStatements(parsed, env);
 			$('#result_' + editorId).html('<p class="success">' + JSON.stringify(result) + '</p>');
