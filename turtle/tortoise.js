@@ -40,6 +40,15 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 			this.x = this.x + Math.cos(Raphael.rad(this.angle)) * operation.distance;
 			this.y = this.y - Math.sin(Raphael.rad(this.angle)) * operation.distance;
 			break;
+		case 'rect':
+			this.paper.rect(this.x, this.y, operation.size, operation.size)).attr(operation.attr);
+			break;
+		case 'circle':
+			this.paper.circle(this.x, this.y, operation.radious)).attr(operation.attr);
+			break;
+		case 'text':
+			this.paper.text(this.x, this.y, operation.text)).attr(operation.attr);
+			break;
 		case 'left':
 			this.angle -= operation.angle;
 			break;
@@ -64,6 +73,18 @@ Tortoise.prototype.left = function(angle) {
 
 Tortoise.prototype.right = function(angle) {
 	this.operations.push({operation: 'right', angle: angle, attr: jQuery.extend(true, {}, this.params)});
+}
+
+Tortoise.prototype.rect = function(size) {
+	this.operations.push({operation: 'rect', size: size, attr: jQuery.extend(true, {}, this.params)});
+}
+
+Tortoise.prototype.circle = function(radious) {
+	this.operations.push({operation: 'circle', radious: radious, attr: jQuery.extend(true, {}, this.params)});
+}
+
+Tortoise.prototype.text = function(text) {
+	this.operations.push({operation: 'text', text: text, attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.updateTortoise = function(animation, callback) {
