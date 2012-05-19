@@ -75,6 +75,7 @@
 									<div class="menuImage"><img src="./images/tortoise.svg" alt="Turtle" /></div>
 									<a href="./turtle_livetest.xml" target="_self">Live!</a>
 									<a href="./turtle_example.xml" target="_self">Examples</a>
+									<a href="./turtle_webtest.xml" target="_self">Tests</a>
 								</td>
 							</tr>
 						</table>

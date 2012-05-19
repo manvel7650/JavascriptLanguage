@@ -26,6 +26,13 @@
 				<buttons><button onclick="executeTurtle('toroid_code','toroid_canvas'); return false;">Run</button></buttons>
 			</editor>					
 		</collapsible>
+		<collapsible title="Fade" id="fade">
+			<canvas id="fade_canvas" class="turtleCanvas"/>		
+			<editor id="fade_code" mode="c" class="turtleEditor">
+				<value><![CDATA[var A;\nvar S;\nvar T;\nA := \'Fading out my friend\';\nS := 10;\n\nT := 100;\n\nleft(45);\nmove(200);\nright(200);\n\nrepeat(100/S) {\n\tT := T-S;\n\topacity(T/100);\n\ttext(A);\n\tmove(S);\n}]]></value>
+				<buttons><button onclick="executeTurtle('fade_code','fade_canvas'); return false;">Run</button></buttons>
+			</editor>					
+		</collapsible>
 		<collapsible title="Flower" id="flower">
 			<canvas id="flower_canvas" class="turtleCanvas"/>		
 			<editor id="flower_code" mode="c" class="turtleEditor">

@@ -78,7 +78,9 @@ function executeTurtle(editorId, canvasId) {
 			turtle.add_binding(env, 'rect', function(a) { turtles[canvasId].rect(a); });
 			turtle.add_binding(env, 'circle', function(a) { turtles[canvasId].circle(a); });
 			turtle.add_binding(env, 'text', function(a) { turtles[canvasId].text(a); });
+			turtle.add_binding(env, 'home', function(a) { turtles[canvasId].home(); });
 			turtle.add_binding(env, 'color', function(c) { turtles[canvasId].params.stroke = c; });			
+			turtle.add_binding(env, 'opacity', function(o) { turtles[canvasId].params.opacity = o; });		
 			var parsed = TURTLE.parse(editors[editorId].getValue());
             var result = turtle.evalStatements(parsed, env);
 			$('#result_' + editorId).html('<p class="success">' + JSON.stringify(result) + '</p>');
