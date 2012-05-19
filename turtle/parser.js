@@ -1676,33 +1676,102 @@ var TURTLE = (function(){
               if (result0 === null) {
                 pos0 = pos;
                 pos1 = pos;
-                if (input.charCodeAt(pos) === 40) {
-                  result0 = "(";
+                if (input.charCodeAt(pos) === 39) {
+                  result0 = "'";
                   pos++;
                 } else {
                   result0 = null;
                   if (reportFailures === 0) {
-                    matchFailed("\"(\"");
+                    matchFailed("\"'\"");
                   }
                 }
                 if (result0 !== null) {
-                  result1 = parse_ws();
+                  result1 = [];
+                  if (/^[^']/.test(input.charAt(pos))) {
+                    result2 = input.charAt(pos);
+                    pos++;
+                  } else {
+                    result2 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("[^']");
+                    }
+                  }
+                  while (result2 !== null) {
+                    result1.push(result2);
+                    if (/^[^']/.test(input.charAt(pos))) {
+                      result2 = input.charAt(pos);
+                      pos++;
+                    } else {
+                      result2 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("[^']");
+                      }
+                    }
+                  }
                   if (result1 !== null) {
-                    result2 = parse_expression();
+                    if (input.charCodeAt(pos) === 39) {
+                      result2 = "'";
+                      pos++;
+                    } else {
+                      result2 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("\"'\"");
+                      }
+                    }
                     if (result2 !== null) {
-                      result3 = parse_ws();
-                      if (result3 !== null) {
-                        if (input.charCodeAt(pos) === 41) {
-                          result4 = ")";
-                          pos++;
-                        } else {
-                          result4 = null;
-                          if (reportFailures === 0) {
-                            matchFailed("\")\"");
+                      result0 = [result0, result1, result2];
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+                if (result0 !== null) {
+                  result0 = (function(offset, v) { return v.join("");})(pos0, result0[1]);
+                }
+                if (result0 === null) {
+                  pos = pos0;
+                }
+                if (result0 === null) {
+                  pos0 = pos;
+                  pos1 = pos;
+                  if (input.charCodeAt(pos) === 40) {
+                    result0 = "(";
+                    pos++;
+                  } else {
+                    result0 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("\"(\"");
+                    }
+                  }
+                  if (result0 !== null) {
+                    result1 = parse_ws();
+                    if (result1 !== null) {
+                      result2 = parse_expression();
+                      if (result2 !== null) {
+                        result3 = parse_ws();
+                        if (result3 !== null) {
+                          if (input.charCodeAt(pos) === 41) {
+                            result4 = ")";
+                            pos++;
+                          } else {
+                            result4 = null;
+                            if (reportFailures === 0) {
+                              matchFailed("\")\"");
+                            }
                           }
-                        }
-                        if (result4 !== null) {
-                          result0 = [result0, result1, result2, result3, result4];
+                          if (result4 !== null) {
+                            result0 = [result0, result1, result2, result3, result4];
+                          } else {
+                            result0 = null;
+                            pos = pos1;
+                          }
                         } else {
                           result0 = null;
                           pos = pos1;
@@ -1719,15 +1788,12 @@ var TURTLE = (function(){
                     result0 = null;
                     pos = pos1;
                   }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-                if (result0 !== null) {
-                  result0 = (function(offset, expression) { return expression; })(pos0, result0[2]);
-                }
-                if (result0 === null) {
-                  pos = pos0;
+                  if (result0 !== null) {
+                    result0 = (function(offset, expression) { return expression; })(pos0, result0[2]);
+                  }
+                  if (result0 === null) {
+                    pos = pos0;
+                  }
                 }
               }
             }
@@ -2046,6 +2112,7 @@ var TURTLE = (function(){
   return result;
 })();
 
+// If we are used as Node module, export symbols
 if (typeof module !== 'undefined') {
 	module.exports = TURTLE;
 }

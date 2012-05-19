@@ -81,6 +81,8 @@ primary
 		{ return {tag:"call", name:v, args:args}; }
 	/ v:identifier
 		{ return {tag:"ident", name:v}; }
+	/ "'" v:([^']*) "'"
+		{ return v.join("");}
 	/ "(" ws expression:expression ws ")"
 		{ return expression; }
 
