@@ -1,6 +1,8 @@
 function Tortoise(imageSrc, paper) {
 	this.paper = paper;
 	this.imageSrc = imageSrc;
+	this.originalX = this.paper.width / 2;
+	this.originalY = this.paper.height / 2;
 	this.operations = [];
 	this.clear();
 }
@@ -9,8 +11,8 @@ Tortoise.prototype.clear = function() {
 	this.params = {
 		stroke: 'black'
 	};
-	this.x = this.paper.width / 2;
-	this.y = this.paper.height / 2;
+	this.x = this.originalX;
+	this.y = this.originalY;
 	this.angle = 90;
 	this.paper.clear();
 	this.image = this.paper.image(this.imageSrc, 0, 0, 32, 32);
@@ -40,6 +42,11 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 			this.x = this.x + Math.cos(Raphael.rad(this.angle)) * operation.distance;
 			this.y = this.y - Math.sin(Raphael.rad(this.angle)) * operation.distance;
 			break;
+		case 'home':
+			this.x = this.originalX;
+			this.y = this.originalY;
+			this.angle = 90;
+			break;
 		case 'rect':
 			this.paper.rect(this.x, this.y, operation.size, operation.size).attr(operation.attr);
 			break;
@@ -57,6 +64,10 @@ Tortoise.prototype.executeOperation = function(operation, animation, callback) {
 			break;
 	}
 	this.updateTortoise(animation, callback);
+}
+
+Tortoise.prototype.home = function(distance) {
+	this.operations.push({operation: 'home', attr: jQuery.extend(true, {}, this.params)});
 }
 
 Tortoise.prototype.move = function(distance) {
