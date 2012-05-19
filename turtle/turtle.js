@@ -39,6 +39,10 @@ var turtle = (function(){
 			if (typeof expr === 'number') {
 				return expr;
 			}
+			// strings evaluate to themselves
+			if (typeof expr === 'string') {
+				return expr;
+			}
 			// Look at tag to see what to do
 			switch(expr.tag) {
 				// Simple built-in binary operations
@@ -170,6 +174,8 @@ var turtle = (function(){
 	};
 	return turtle;
 })();
+
+console.log(typeof 'abc');
 
 // If we are used as Node module, export symbols
 if (typeof module !== 'undefined') {
