@@ -4,6 +4,7 @@
 	<js src="./turtle/parser.js" />
 	<js src="./turtle/turtle.js" />
 	<js src="./turtle/tortoise.js" />
+	<js src="./continuations/continuations.js" />
 	<block title="Turtle Live Demo">
 		<canvas id="turtle_canvas" class="turtleCanvas"/>
 		<editor id="turtle_code" mode="c" class="turtleEditor">

@@ -7,6 +7,7 @@
 	<js>mocha.setup('tdd');</js>
 	<js src="./turtle/parser.js" />
 	<js src="./turtle/turtle.js" />
+	<js src="./continuations/continuations.js" />
 	<js src="./turtle/test/turtleTest.js" />
 	<load>mocha.run();</load>
 	<block title="Mocha Tests">

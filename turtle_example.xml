@@ -4,6 +4,7 @@
 	<js src="./turtle/parser.js" />
 	<js src="./turtle/turtle.js" />
 	<js src="./turtle/tortoise.js" />
+	<js src="./continuations/continuations.js" />
 	<block title="Turtle Examples">
 		<collapsible title="Rose" id="rose">
 			<canvas id="rose_canvas" class="turtleCanvas"/>		
