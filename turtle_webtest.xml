@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="template.xsl"?>
+<page title="PL101 Javascript Language">
+	<css href="./css/mocha.css"/>
+	<js src="./js/mocha.js" />
+	<js src="./js/chai.js" />
+	<js>mocha.setup('tdd');</js>
+	<js src="./turtle/parser.js" />
+	<js src="./turtle/turtle.js" />
+	<js src="./turtle/test/turtleTest.js" />
+	<load>mocha.run();</load>
+	<block title="Mocha Tests">
+		<html>
+			<div id="mocha" />
+		</html>
+	</block>
+</page>
