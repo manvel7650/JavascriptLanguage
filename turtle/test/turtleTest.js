@@ -7,6 +7,7 @@ if (typeof module !== 'undefined') {
 	var evalExpr = turtle.evalExpr;
 	var evalStatement = turtle.evalStatement;
 	var evalStatements = turtle.evalStatements;
+	var continuations = require('../../continuations/continuations');
 } else {
 	var parse = TURTLE.parse;
 	var assert = chai.assert;
@@ -302,7 +303,7 @@ suite('parse', function() {
 
 suite('evalExpression', function () {
 	var env = { bindings: 
-		{x: 5, y: 24, f: function(a) { return 3 * a + 1; } },
+		{x: 5, y: 24, f: function(cont, a) { return continuations.thunk(cont, 3 * a + 1); } },
 		outer: { bindings: {x: 3, z: 101}, outer: { } } };
 	test('number', function () {
 		var expr = parse('5', 'expression');
@@ -352,7 +353,7 @@ suite('evalExpression', function () {
 
 suite('evalStatement', function () {
 	var env = { bindings: 
-		{x: 5, y: 24, f: function(a) { return 3 * a + 1; } },
+		{x: 5, y: 24, f: function(cont, a) { return continuations.thunk(cont, 3 * a + 1); } },
 		outer: { bindings: {x: 3, z: 101}, outer: { } } };
 	test('x;', function () {
 		var stmt = parse('x;', 'statement');
@@ -404,7 +405,7 @@ suite('evalStatement', function () {
 
 suite('evalStatements', function () {
 	var env = { bindings: 
-		{x: 5, y: 24, f: function(a) { return 3 * a + 1; } },
+		{x: 5, y: 24, f: function(cont, a) { return continuations.thunk(cont, 3 * a + 1); } },
 		outer: { bindings: {x: 3, z: 101}, outer: { } } };
 	test('3; f(3);', function () {
 		var stmt = parse('3; f(3);', 'statements');

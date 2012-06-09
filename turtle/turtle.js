@@ -1,3 +1,8 @@
+if (typeof module !== 'undefined') {
+	var continuations = require('../continuations/continuations');
+	var TURTLE = require('./parser.js');
+}
+
 var turtle = (function(){
 	var turtle = {
 		lookup : function (env, v) {
@@ -32,113 +37,135 @@ var turtle = (function(){
 			}
 		},
 
-
 		// Evaluate a Tortoise expression, return value
-		evalExpr : function (expr, env) {
+		internalEvalExpr : function (expr, env, cont) {
 			// Numbers evaluate to themselves
 			if (typeof expr === 'number') {
-				return expr;
+				return continuations.thunk(cont, expr);
 			}
 			// strings evaluate to themselves
 			if (typeof expr === 'string') {
-				return expr;
+				return continuations.thunk(cont, expr);
 			}
+			
 			// Look at tag to see what to do
 			switch(expr.tag) {
 				// Simple built-in binary operations
 				case '<':
-					return turtle.evalExpr(expr.left, env) < turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 < v2;}, cont);
 				case '<=':
-					return turtle.evalExpr(expr.left, env) <= turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 <= v2;}, cont);
 				case '>':
-					return turtle.evalExpr(expr.left, env) > turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 > v2;}, cont);
 				case '>=':
-					return turtle.evalExpr(expr.left, env) >= turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 >= v2;}, cont);
 				case '==':
-					return turtle.evalExpr(expr.left, env) === turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 == v2;}, cont);
 				case '!=':
-					return turtle.evalExpr(expr.left, env) !== turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 != v2;}, cont);
 				case '+':
-					return turtle.evalExpr(expr.left, env) + turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 + v2;}, cont);
 				case '-':
-					return turtle.evalExpr(expr.left, env) - turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 - v2;}, cont);
 				case '*':
-					return turtle.evalExpr(expr.left, env) * turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 * v2;}, cont);
 				case '/':
-					return turtle.evalExpr(expr.left, env) / turtle.evalExpr(expr.right, env);
+					return continuations.thunk(turtle.internalEvalBinaryStatement, expr.left, expr.right, env, function(v1, v2) { return v1 / v2;}, cont);
 				// Lookup identifiers
 				case 'ident':
-					return turtle.lookup(env, expr.name);
+					return continuations.thunk(cont, turtle.lookup(env, expr.name));
 				// Function calls
 				case 'call':
 					// Get function value (in Tortoise can only be a name)
 					var func = turtle.lookup(env, expr.name);
 					// Evaluate arguments to pass
-					var ev_args = [];
-					var i = 0;
-					for(i = 0; i < expr.args.length; i++) {
-						ev_args[i] = turtle.evalExpr(expr.args[i], env);
-					}
-					return func.apply(null, ev_args);
+					var ev_args = [cont];
+					var i= 0;
+					var evalArgs = function(arg) {
+						if(i > 0) {
+							ev_args.push(arg);
+						}
+						if(i === expr.args.length) {
+							return continuations.thunkArray(func, ev_args);
+						} else {
+							
+							return continuations.thunk(turtle.internalEvalExpr, expr.args[i++], env, evalArgs);
+						}
+					};
+					return evalArgs(undefined);
 				// Should not get here
 				default:
 					throw new Error('Unknown form in AST expression ' + expr.tag);
 			}
 		},
 
+		internalEvalBinaryStatement : function(exprLeft, exprRight, env, f, cont) {
+			return continuations.thunk(turtle.internalEvalExpr, exprLeft, env, function(v1) {
+				return continuations.thunk(turtle.internalEvalExpr, exprRight, env, function(v2) {
+					return continuations.thunk(cont, f.call(null, v1, v2));
+				});
+			});
+		},
+
 		// Evaluate a Tortoise statement
-		evalStatement : function (stmt, env) {
-			var i;
-			var num;
-			var cond_expr;
-			var val = undefined;
+		internalEvalStatement : function (stmt, env, cont) {
 			// Statements always have tags
 			switch(stmt.tag) {
 				// A single expression
 				case 'ignore':
 					// Just evaluate expression
-					return turtle.evalExpr(stmt.body, env);
+					return continuations.thunk(turtle.internalEvalExpr, stmt.body, env, cont);
 				// Assignment
 				case ':=':
 					// Evaluate right hand side
-					val = turtle.evalExpr(stmt.right, env);
-					turtle.update(env, stmt.left, val);
-					return val;
+					return turtle.internalEvalExpr(stmt.right, env, function(val) {
+						turtle.update(env, stmt.left, val);
+						return continuations.thunk(cont, val);
+					});
+					
 				// Declare new variable
 				case 'var':
 					// New variable gets default value of 0
 					turtle.add_binding(env, stmt.name, 0);
-					return 0;
+					return continuations.thunk(cont, 0);
 				// Repeat
 				case 'repeat':
 					// Evaluate expr for number of times to repeat
-					num = turtle.evalExpr(stmt.expr, env);
-					// Now do a loop
-					for(i = 0; i < num; i++) {
-						val = turtle.evalStatements(stmt.body, env);
-					}
-					return val;
+					return turtle.internalEvalExpr(stmt.expr, env, function(num) {
+						// Now do a loop
+						var next = function(val) {
+							if(num-- === 0) {
+								return continuations.thunk(cont, val);
+							} else {
+								return continuations.thunk(turtle.internalEvalStatements, stmt.body, env, next);
+							}
+						};
+						return next(undefined);
+					});
 				// While
 				case 'while':
 					// do a loop
-					while(true) {
-						num = turtle.evalExpr(stmt.expr, env);
-						// check expr
-						if(num === null) break;
-						if(typeof num === 'number' && num === 0) break;
-						if(!num) break;
-						
-						val = turtle.evalStatements(stmt.body, env);
-					}
-					return val;
+					var next = function(val) {
+						return turtle.internalEvalExpr(stmt.expr, env, function(num) {
+							// check expr
+							if(num === null || (typeof num === 'number' && num === 0) || !num) {
+								return continuations.thunk(cont, val);
+							} else {
+								return continuations.thunk(turtle.internalEvalStatements, stmt.body, env, next);
+							}
+						});
+					};
+					return next(undefined);
+					
 				// If
 				case 'if':
-					cond_expr = turtle.evalExpr(stmt.expr, env);
-					val = undefined;
-					if(cond_expr) {
-						val = turtle.evalStatements(stmt.body, env);
-					}
-					return val;
+					return turtle.internalEvalExpr(stmt.expr, env, function(cond_expr) {
+						if(cond_expr) {
+							return continuations.thunk(turtle.internalEvalStatements, stmt.body, env, cont);
+						} else {
+							return continuations.thunk(cont, undefined);
+						}
+					});
 				// Define new function
 				case 'define':
 					// name args body
@@ -149,13 +176,13 @@ var turtle = (function(){
 						var new_bindings;
 						new_bindings = { };
 						for(i = 0; i < stmt.args.length; i++) {
-							new_bindings[stmt.args[i]] = arguments[i];
+							new_bindings[stmt.args[i]] = arguments[i + 1];
 						}
 						new_env = { bindings: new_bindings, outer: env };
-						return turtle.evalStatements(stmt.body, new_env);
+						return continuations.thunk(turtle.internalEvalStatements, stmt.body, new_env, arguments[0]);
 					};
 					turtle.add_binding(env, stmt.name, new_func);
-					return 0;
+					return continuations.thunk(cont, 0);
 				// Should not get here
 				default:
 					throw new Error('Unknown form in AST statement ' + stmt.tag);
@@ -163,19 +190,54 @@ var turtle = (function(){
 		},
 
 		// Evaluate a list of Tortoise statements, return undefined
-		evalStatements : function (seq, env) {
-			var i;
-			var val = undefined;
-			for(i = 0; i < seq.length; i++) {
-				val = turtle.evalStatement(seq[i], env);
+		internalEvalStatements : function (seq, env, cont) {
+			var i = 0;
+			var next = function(val) {
+				if(i >= seq.length) {
+					return continuations.thunk(cont, val);
+				} else {
+					return continuations.thunk(turtle.internalEvalStatement, seq[i++], env, next);
+				}
 			}
-			return val;
+			return next(undefined);
+		},
+		
+		evalExpr : function (expr, env) {
+			var state = { 
+				data: turtle.internalEvalExpr(expr, env, continuations.thunkValue),
+				done: false
+			};
+			while(!state.done) {
+				continuations.step(state);
+			}
+			return state.data;
+		},
+		
+		evalStatement : function (stmt, env) {
+			var state = { 
+				data: turtle.internalEvalStatement(stmt, env, continuations.thunkValue),
+				done: false
+			};
+			while(!state.done) {
+				continuations.step(state);
+			}
+			return state.data;
+		},
+		
+		evalStatements : function(seq, env) {
+			var state = { 
+				data: turtle.internalEvalStatements(seq, env, continuations.thunkValue),
+				done: false
+			};
+			while(!state.done) {
+				continuations.step(state);
+			}
+			return state.data;
 		}
+
 	};
 	return turtle;
 })();
-
-console.log(typeof 'abc');
 
 // If we are used as Node module, export symbols
 if (typeof module !== 'undefined') {
