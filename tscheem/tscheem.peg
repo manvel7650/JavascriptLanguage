@@ -1,0 +1,43 @@
+// Start rule
+start = _* e:expr _* {return e;}
+
+// Production rules
+expr	= e:(begin / define / let / set / lambda / if / quote / func / list / number / atom / boolean)	{ return e; }
+begin	= SP op:BEGIN _+ e:eList EP								 										{ return [op].concat(e); } 
+eList	= start:expr rest:(_+ e:expr {return e;})*														{ return [start].concat(rest); } 
+define	= SP op:DEFINE _+ a:atom _+ e:expr EP															{ return [op, a, e]; } 
+set		= SP op:SET _+ a:atom _+ e:expr EP 																{ return [op, a, e]; } 
+lambda	= SP op:LAMBDA _+ SP a:tAtoms EP _+ e:expr EP 													{ return [op, a, e]; } 
+if		= SP op:IF _+ cond:expr _+ left:expr _+ right:expr EP 											{ return [op, cond, left, right]; } 
+quote	= SP op:QUOTE _+ e:(expr) EP 																	{ return [op, e]; }
+		/ QUOTE2 e:(expr)		 																		{ return ['quote', e]; } 
+func 	= SP op:(FUNC / lambda / atom) _+ e:eList EP													{ return [op].concat(e); }
+list	= SP start:expr rest:(_+ e:expr {return e;})* EP												{ return [start].concat(rest); } 
+number	= sign:[+-]? int:[0-9]+ '.' float:[0-9]+  														{ return parseFloat(sign + int.join('') + '.' + float.join('')); }
+		/ sign:[+-]? int:[0-9]+ 																		{ return parseInt(sign + int.join('')); }
+atom	= !(TOKEN) a:(a:[a-zA-Z] b:[a-zA-Z0-9]* {return a + b.join('');}) 								{ return a; }
+atoms	= start:atom rest:(_+ a:atom {return a;})*														{ return [start].concat(rest); }
+tAtom	= a:atom _+ t:type																				{ return {atom: a, type: t}; }
+tAtoms	= start:tAtom rest:(_+ a:tAtom {return a;})*													{ return [start].concat(rest); }
+type	= t:('bool' / 'num' / 'list' / 'function')														{ return t; }
+boolean	= TRUE / FALSE
+
+// Tokens
+EOL		= [\n\r]{1,2} / !.
+COMMENT	= ';;' [^\n\r]* EOL
+_		= WS / COMMENT
+WS		= [ \t\n\r] 
+BEGIN 	= 'begin'
+LET		= 'let'
+DEFINE	= 'define'
+SET		= 'set!'
+IF		= 'if'
+QUOTE	= 'quote'
+QUOTE2	= '\''
+LAMBDA	= 'lambda'
+FUNC	= '+' / '*' / '/' / '-' / '=' / '<' / '>' / '<=' / '>=' / '!=' / 'list' / 'cons' / 'car' / 'cdr' / 'length' / 'append' / 'alert'
+TRUE	= '#t'
+FALSE	= '#f'
+TOKEN	= BEGIN / DEFINE / SET / IF / QUOTE / LAMBDA/ FUNC / TRUE / FALSE
+SP		= '(' _* 
+EP		= _* ')'
